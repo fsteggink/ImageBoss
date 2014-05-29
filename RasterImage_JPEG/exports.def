@@ -1,0 +1,6 @@
+LIBRARY RasterImage_JPEG
+
+EXPORTS 
+	CreatePlugin			@1
+	SupportedInterfaces		@2
+	SupportsInterface		@3

@@ -1,0 +1,9 @@
+*.opensdf
+*.sdf
+*.suo
+*.user
+Debug
+ipch
+Release
+UpgradeLog.xml
+_UpgradeReport_Files
