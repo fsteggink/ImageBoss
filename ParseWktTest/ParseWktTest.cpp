@@ -17,6 +17,9 @@ int main(int argc, char *argv[])
 {
 	std::cout.precision(10);
 
+	//const char WKT_CRS[] = "PROJCS[\"Amersfoort / RD New\",GEOGCS[\"Amersfoort\",DATUM[\"Amersfoort\",SPHEROID[\"Bessel 1841\",6377397.155,299.1528128],TOWGS84[565.04,49.91,465.84,-1.9848e-6,1.7439e-6,-9.0587e-6,4.0772e-6]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.01745329251994328]],PROJECTION[\"Oblique_Stereographic\"],PARAMETER[\"latitude_of_origin\",52.15616055555555],PARAMETER[\"central_meridian\",5.38763888888889],PARAMETER[\"scale_factor\",0.9999079],PARAMETER[\"false_easting\",155000],PARAMETER[\"false_northing\",463000],UNIT[\"metre\",1]]";
+	const char WKT_CRS[] = "PROJCS[\"Amersfoort / RD New\",GEOGCS[\"Amersfoort\",DATUM[\"Amersfoort\",SPHEROID[\"Bessel 1841\",6377397.155,299.1528128],TOWGS84[565.04,49.91,465.84,-1.9848e-6,1.7439e-6,-9.0587e-6,4.0772e-6]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.01745329251994328]],PROJECTION[\"Oblique_Stereographic\"],PARAMETER[\"latitude_of_origin\",52.15616055555555],PARAMETER[\"central_meridian\",5.38763888888889],PARAMETER[\"scale_factor\",0.9999079],PARAMETER[\"false_easting\",155000],PARAMETER[\"false_northing\",463000],UNIT[\"metre\",1]]";
+
 	//const char WKT_CRS[] = "GEOGCS[\"OSGB 1936\",DATUM[\"OSGB_1936\",SPHEROID[\"Airy 1830\",6377563.396,299.3249646,AUTHORITY[\"EPSG\",\"7001\"]],TOWGS84[375,-111,431,0,0,0,0],AUTHORITY[\"EPSG\",\"6277\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"DMSH\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST],AUTHORITY[\"EPSG\",\"4277\"]]";
 	//const char WKT_CRS[] = "PROJCS[\"OSGB 1936 / British National Grid\",GEOGCS[\"OSGB 1936\",DATUM[\"OSGB_1936\",SPHEROID[\"Airy 1830\",6377563.396,299.3249646,AUTHORITY[\"EPSG\",\"7001\"]],TOWGS84[375,-111,431,0,0,0,0],AUTHORITY[\"EPSG\",\"6277\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"DMSH\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST],AUTHORITY[\"EPSG\",\"4277\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",49],PARAMETER[\"central_meridian\",-2],PARAMETER[\"scale_factor\",0.999601272],PARAMETER[\"false_easting\",400000],PARAMETER[\"false_northing\",-100000],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"E\",EAST],AXIS[\"N\",NORTH],AUTHORITY[\"EPSG\",\"27700\"]],";
 	//const char WKT_CRS[] = "COMPD_CS[\"OSGB36 / British National Grid + ODN\",PROJCS[\"OSGB 1936 / British National Grid\",GEOGCS[\"OSGB 1936\",DATUM[\"OSGB_1936\",SPHEROID[\"Airy 1830\",6377563.396,299.3249646,AUTHORITY[\"EPSG\",\"7001\"]],TOWGS84[375,-111,431,0,0,0,0],AUTHORITY[\"EPSG\",\"6277\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"DMSH\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST],AUTHORITY[\"EPSG\",\"4277\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",49],PARAMETER[\"central_meridian\",-2],PARAMETER[\"scale_factor\",0.999601272],PARAMETER[\"false_easting\",400000],PARAMETER[\"false_northing\",-100000],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"E\",EAST],AXIS[\"N\",NORTH],AUTHORITY[\"EPSG\",\"27700\"]],VERT_CS[\"Newlyn\",VERT_DATUM[\"Ordnance Datum Newlyn\",2005,AUTHORITY[\"EPSG\",\"5101\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"Up\",UP],AUTHORITY[\"EPSG\",\"5701\"]],AUTHORITY[\"EPSG\",\"7405\"]]";
@@ -34,7 +37,7 @@ int main(int argc, char *argv[])
 	//const char WKT_CRS[] = "PROJCS[\"Test LCC\",GEOGCS[\"WGS 84\",DATUM[\"WGS 84\",SPHEROID[\"WGS 84\",6378206.400,294.97870,AUTHORITY[\"EPSG\",\"7030\"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"DMSH\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Lambert_Conformal_Conic\"],PARAMETER[\"latitude_of_origin\",18],PARAMETER[\"central_meridian\",-77],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",250000],PARAMETER[\"false_northing\",150000.00],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"E\",EAST],AXIS[\"N\",NORTH],AUTHORITY[\"FS\",\"0\"]]";
 	
 	
-	//const char WKT_CRS[] = "PROJCS[\"Bonne\",GEOGCS[\"Amersfoort\",DATUM[\"Amersfoort\",SPHEROID[\"Bessel 1841\",6377397.155,299.1528128],TOWGS84[565.04,49.91,465.84,4.0772e-6,-1.9848e-6,1.7439e-6,-9.0587e-6]],PRIMEM[\"Greenwich\",0],UNIT[\"DMSH\",0.0174532925199433],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST]],PROJECTION[\"Bonne\"],PARAMETER[\"latitude_of_origin\",51.5],PARAMETER[\"central_meridian\",4.883883008],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",12],PARAMETER[\"false_northing\",-60],UNIT[\"metre\",1],AXIS[\"E\",EAST],AXIS[\"N\",NORTH]]";
+	//const char WKT_CRS[] = "PROJCS[\"Bonne\",GEOGCS[\"Amersfoort\",DATUM[\"Amersfoort\",SPHEROID[\"Bessel 1841\",6377397.155,299.1528128],TOWGS84[565.04,49.91,465.84,-1.9848e-6,1.7439e-6,-9.0587e-6,4.0772e-6]],PRIMEM[\"Greenwich\",0],UNIT[\"DMSH\",0.0174532925199433],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST]],PROJECTION[\"Bonne\"],PARAMETER[\"latitude_of_origin\",51.5],PARAMETER[\"central_meridian\",4.883883008],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",12],PARAMETER[\"false_northing\",-60],UNIT[\"metre\",1],AXIS[\"E\",EAST],AXIS[\"N\",NORTH]]";
 	//const char WKT_CRS[] = "PROJCS[\"Bonne\",GEOGCS[\"Amersfoort\",DATUM[\"Amersfoort\",SPHEROID[\"Bessel 1841\",6377397.155,299.1528128],TOWGS84[0,0,0,0,0,0,0]],PRIMEM[\"Amsterdam\",4.883883008],UNIT[\"DMSH\",0.0174532925199433],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST]],PROJECTION[\"Bonne\"],PARAMETER[\"latitude_of_origin\",51.5],PARAMETER[\"central_meridian\",0],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"E\",EAST],AXIS[\"N\",NORTH]]";
 	//const char WKT_AMERSFOORT[] = "GEOGCS[\"Amersfoort\",DATUM[\"Amersfoort\",SPHEROID[\"Bessel 1841\",6377397.155,299.1528128],TOWGS84[0,0,0,0,0,0,0]],PRIMEM[\"Greenwich\",0],UNIT[\"DMSH\",0.0174532925199433],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST]]";
 
@@ -73,13 +76,13 @@ int main(int argc, char *argv[])
 	//const char WKT_CRS2[] = "PROJCS[\"NTF (Paris) / Lambert Centre France\",GEOGCS[\"NTF (Paris)\",DATUM[\"Nouvelle_Triangulation_Francaise_Paris\",SPHEROID[\"Clarke 1880 (IGN)\",6378249.2,293.4660212936269,AUTHORITY[\"EPSG\",\"7011\"]],TOWGS84[-168,-60,320,0,0,0,0],AUTHORITY[\"EPSG\",\"6807\"]],PRIMEM[\"Greenwich\",0],UNIT[\"DMSH\",0.0174532925199433],AUTHORITY[\"EPSG\",\"4807\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],PROJECTION[\"Lambert_Conformal_Conic_1SP\"],PARAMETER[\"latitude_of_origin\",46.8],PARAMETER[\"central_meridian\",2.33722917],PARAMETER[\"scale_factor\",0.99987742],PARAMETER[\"false_easting\",600000],PARAMETER[\"false_northing\",200000],AUTHORITY[\"EPSG\",\"27562\"],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH]]";
 	//const char WKT_CRS2[] = "PROJCS[\"NTF (Paris) / Lambert Sud France\",GEOGCS[\"NTF (Paris)\",DATUM[\"Nouvelle_Triangulation_Francaise_Paris\",SPHEROID[\"Clarke 1880 (IGN)\",6378249.2,293.4660212936269,AUTHORITY[\"EPSG\",\"7011\"]],TOWGS84[-168,-60,320,0,0,0,0],AUTHORITY[\"EPSG\",\"6807\"]],PRIMEM[\"Greenwich\",0],UNIT[\"DMSH\",0.0174532925199433],AUTHORITY[\"EPSG\",\"4807\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],PROJECTION[\"Lambert_Conformal_Conic_1SP\"],PARAMETER[\"latitude_of_origin\",44.1],PARAMETER[\"central_meridian\",2.33722917],PARAMETER[\"scale_factor\",0.999877499],PARAMETER[\"false_easting\",600000],PARAMETER[\"false_northing\",200000],AUTHORITY[\"EPSG\",\"27563\"],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH]]";
 	//const char WKT_CRS2[] = "GEOGCS[\"Clarke 1866\",DATUM[\"Test2\",SPHEROID[\"Clarke 1866\",6378206.4,294.9786982139006],TOWGS84[-30,-48,105,0,0,0,0]],PRIMEM[\"Greenwich\",0],UNIT[\"DMSH\",0.0174532925199433]]";
-	const char WKT_CRS2[] = "PROJCS[\"NordDeGuerre\",GEOGCS[\"X\",DATUM[\"WGS 84\",SPHEROID[\"DuPlessis\",6376523,308.64],TOWGS84[1383,44,454,0,0,0,0]],PRIMEM[\"Greenwich\",0,],UNIT[\"DMSH\",0.0174532925199433],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST]],PROJECTION[\"Lambert_Conformal_Conic_1SP\"],PARAMETER[\"latitude_of_origin\",49.50],PARAMETER[\"central_meridian\",7.7372083330],PARAMETER[\"scale_factor\",0.999509081],PARAMETER[\"false_easting\",600000],PARAMETER[\"false_northing\",300000],UNIT[\"metre\",1],AXIS[\"E\",EAST],AXIS[\"N\",NORTH]]";
+	//const char WKT_CRS2[] = "PROJCS[\"NordDeGuerre\",GEOGCS[\"X\",DATUM[\"WGS 84\",SPHEROID[\"DuPlessis\",6376523,308.64],TOWGS84[1383,44,454,0,0,0,0]],PRIMEM[\"Greenwich\",0,],UNIT[\"DMSH\",0.0174532925199433],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST]],PROJECTION[\"Lambert_Conformal_Conic_1SP\"],PARAMETER[\"latitude_of_origin\",49.50],PARAMETER[\"central_meridian\",7.7372083330],PARAMETER[\"scale_factor\",0.999509081],PARAMETER[\"false_easting\",600000],PARAMETER[\"false_northing\",300000],UNIT[\"metre\",1],AXIS[\"E\",EAST],AXIS[\"N\",NORTH]]";
 	//const char WKT_CRS2[] = "PROJCS[\"NTF (Paris) / Lambert Nord France\",GEOGCS[\"NTF (Paris)\",DATUM[\"Nouvelle_Triangulation_Francaise_Paris\",SPHEROID[\"Clarke 1880 (IGN)\",6378249.2,293.4660212936269,AUTHORITY[\"EPSG\",\"7011\"]],TOWGS84[-168,-60,320,0,0,0,0],AUTHORITY[\"EPSG\",\"6807\"]],PRIMEM[\"Greenwich\",0],UNIT[\"DMSH\",0.0174532925199433],AUTHORITY[\"EPSG\",\"4807\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],PROJECTION[\"Lambert_Conformal_Conic_1SP\"],PARAMETER[\"latitude_of_origin\",49.5],PARAMETER[\"central_meridian\",2.33722917],PARAMETER[\"scale_factor\",0.999877341],PARAMETER[\"false_easting\",600000],PARAMETER[\"false_northing\",200000],AUTHORITY[\"EPSG\",\"27561\"],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH]]";
 
 	// Lambert zones o.b.v. andere ellipsoides
 	//const char WKT_CRS[] = "PROJCS[\"Lambert II test\",GEOGCS[\"Test\",DATUM[\"Test2\",SPHEROID[\"Clarke 1866\",6378206.4,294.9786982139006],TOWGS84[-168,-60,320,0,0,0,0]],PRIMEM[\"Greenwich\",0],UNIT[\"DMSH\",0.0174532925199433]],PROJECTION[\"Lambert_Conformal_Conic_1SP\"],PARAMETER[\"latitude_of_origin\",46.8],PARAMETER[\"central_meridian\",2.33722917],PARAMETER[\"scale_factor\",0.99987742],PARAMETER[\"false_easting\",600000],PARAMETER[\"false_northing\",200000],AUTHORITY[\"EPSG\",\"27562\"],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH]]";
 	//const char WKT_CRS[] = "PROJCS[\"BonneATF\",GEOGCS[\"ATF\",DATUM[\"ATF\",SPHEROID[\"Clarke 1880 (IGN)\",6378249.2,293.4660212936269],TOWGS84[-168,-60,320,0,0,0,0]],PRIMEM[\"Greenwich\",0],UNIT[\"DMSH\",0.0174532925199433],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST]],PROJECTION[\"Bonne\"],PARAMETER[\"latitude_of_origin\",45],PARAMETER[\"central_meridian\",2.33722917],PARAMETER[\"false_easting\",600000],PARAMETER[\"false_northing\",300000],PARAMETER[\"scale_factor\",0.99987742],UNIT[\"metre\",1],AXIS[\"E\",EAST],AXIS[\"N\",NORTH]]";
-	const char WKT_CRS[] = "PROJCS[\"BonneNTF\",GEOGCS[\"NTF (Paris)\",DATUM[\"NTF (Paris)\",SPHEROID[\"Clarke 1880 (IGN)\",6378249.2,293.4660212936269],TOWGS84[-168,-60,320,0,0,0,0]],PRIMEM[\"Greenwich\",0],UNIT[\"DMSH\",0.0174532925199433],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST]],PROJECTION[\"Bonne\"],PARAMETER[\"latitude_of_origin\",45],PARAMETER[\"central_meridian\",2.33722917],PARAMETER[\"scale_factor\",0.99987742],PARAMETER[\"false_easting\",600000],PARAMETER[\"false_northing\",300000],UNIT[\"metre\",1],AXIS[\"E\",EAST],AXIS[\"N\",NORTH]]";
+	//const char WKT_CRS[] = "PROJCS[\"BonneNTF\",GEOGCS[\"NTF (Paris)\",DATUM[\"NTF (Paris)\",SPHEROID[\"Clarke 1880 (IGN)\",6378249.2,293.4660212936269],TOWGS84[-168,-60,320,0,0,0,0]],PRIMEM[\"Greenwich\",0],UNIT[\"DMSH\",0.0174532925199433],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST]],PROJECTION[\"Bonne\"],PARAMETER[\"latitude_of_origin\",45],PARAMETER[\"central_meridian\",2.33722917],PARAMETER[\"scale_factor\",0.99987742],PARAMETER[\"false_easting\",600000],PARAMETER[\"false_northing\",300000],UNIT[\"metre\",1],AXIS[\"E\",EAST],AXIS[\"N\",NORTH]]";
 	//const char WKT_CRS[] = "PROJCS[\"BonneATF\",GEOGCS[\"ATF\",DATUM[\"ATF\",SPHEROID[\"DuPlessis\",6376523,308.64],TOWGS84[1383,44,454,0,0,0,0]],PRIMEM[\"Greenwich\",0],UNIT[\"DMSH\",0.0174532925199433],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST]],PROJECTION[\"Bonne\"],PARAMETER[\"latitude_of_origin\",45],PARAMETER[\"central_meridian\",2.33722917],PARAMETER[\"false_easting\",600000],PARAMETER[\"false_northing\",300000],UNIT[\"metre\",1],AXIS[\"E\",EAST],AXIS[\"N\",NORTH]]";
 
 	// Iberisch schiereiland
@@ -88,31 +91,38 @@ int main(int argc, char *argv[])
 	//const char WKT_CRS2[] = "PROJCS[\"X\",GEOGCS[\"X\",DATUM[\"Hayford\",SPHEROID[\"Hayford\",6378388,297.0],TOWGS84[0,0,0,0,0,0,0]],PRIMEM[\"Greenwich\",0,],UNIT[\"DMSH\",0.0174532925199433],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST]],PROJECTION[\"Lambert_Conformal_Conic_1SP\"],PARAMETER[\"latitude_of_origin\",40.0],PARAMETER[\"central_meridian\",-3.687375],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",600000],PARAMETER[\"false_northing\",530000],UNIT[\"metre\",1],AXIS[\"E\",EAST],AXIS[\"N\",NORTH]]";
 	//const char WKT_CRS2[] = "PROJCS[\"X\",GEOGCS[\"X\",DATUM[\"Hayford\",SPHEROID[\"Hayford\",6378388,297.0],TOWGS84[-30,-48,105,0,0,0,0]],PRIMEM[\"Greenwich\",0,],UNIT[\"DMSH\",0.0174532925199433],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST]],PROJECTION[\"Lambert_Conformal_Conic_1SP\"],PARAMETER[\"latitude_of_origin\",40.0],PARAMETER[\"central_meridian\",-3.687375],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",600000],PARAMETER[\"false_northing\",530000],UNIT[\"metre\",1],AXIS[\"E\",EAST],AXIS[\"N\",NORTH]]";
 
+	// Cassini-Soldner
+	//const char WKT_CRS[] = "PROJCS[\"Catast_MonteCastelluccio\",GEOGCS[\"GCS_MonteCastelluccio\",DATUM[\"<custom>\",SPHEROID[\"Bessel_1841\",6377397.155,299.1528128]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Cassini\"],PARAMETER[\"False_Easting\",0.0],PARAMETER[\"False_Northing\",0.0],PARAMETER[\"Central_Meridian\",13.77912777777778],PARAMETER[\"Scale_Factor\",1.0],PARAMETER[\"Latitude_Of_Origin\",37.41457777777778],UNIT[\"Meter\",1.0]]";
+	//const char WKT_CRS[] = "PROJCS[\"Trinidad 1903 / Trinidad Grid\",GEOGCS[\"Trinidad 1903\",DATUM[\"Trinidad_1903\",SPHEROID[\"Clarke 1858\",6378293.645208759,294.2606763692654,AUTHORITY[\"EPSG\",\"7007\"]],AUTHORITY[\"EPSG\",\"6302\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4302\"]],UNIT[\"Clarke's link\",0.201166195164,AUTHORITY[\"EPSG\",\"9039\"]],PROJECTION[\"Cassini_Soldner\"],PARAMETER[\"latitude_of_origin\",10.44166666666667],PARAMETER[\"central_meridian\",-61.33333333333334],PARAMETER[\"false_easting\",430000],PARAMETER[\"false_northing\",325000],AUTHORITY[\"EPSG\",\"30200\"],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]";
+	//const char WKT_CRS[] = "PROJCS[\"Trinidad 1903 / Trinidad Grid\",GEOGCS[\"Trinidad 1903\",DATUM[\"Trinidad_1903\",SPHEROID[\"Clarke 1858\",6378293.645208759,294.2606763692654,AUTHORITY[\"EPSG\",\"7007\"]],AUTHORITY[\"EPSG\",\"6302\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4302\"]],UNIT[\"Clarke's link\",0.201166195164,AUTHORITY[\"EPSG\",\"9039\"]],PROJECTION[\"Cassini_Soldner\"],PARAMETER[\"latitude_of_origin\",10.44166666666667],PARAMETER[\"central_meridian\",-61.33333333333334],PARAMETER[\"false_easting\",86501.46392052],PARAMETER[\"false_northing\",65379.0134283],AUTHORITY[\"EPSG\",\"30200\"],AXIS[\"Easting\",EAST],AXIS[\"Northing\",NORTH]]";
+	//const char WKT_CRS2[] = "GEOGCS[\"WGS 84\",DATUM[\"WGS 84\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"DMSH\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9108\"]],AXIS[\"Lat\",NORTH],AXIS[\"Long\",EAST],AUTHORITY[\"EPSG\",\"4326\"]]";
+
+	try {
 
 	//std::cout << "test 1" << std::endl;
 	boost::shared_ptr<CoordinateSystem> cs = CoordinateSystem::CreateCS(WKT_CRS);
-	boost::shared_ptr<CoordinateSystem> cs2 = CoordinateSystem::CreateCS(WKT_CRS2);
+	//boost::shared_ptr<CoordinateSystem> cs2 = CoordinateSystem::CreateCS(WKT_CRS2);
 	//boost::shared_ptr<CoordinateSystem> csAmersfoort = CoordinateSystem::CreateCS(WKT_AMERSFOORT);
 	//std::cout << "test 2" << std::endl;
 
 	boost::shared_ptr<ProjectedCS> pcs = boost::static_pointer_cast<ProjectedCS>(cs);
 	//boost::shared_ptr<GeographicCS> gcs = boost::static_pointer_cast<GeographicCS>(cs2);
-	boost::shared_ptr<ProjectedCS> pcs2 = boost::static_pointer_cast<ProjectedCS>(cs2);
+	//boost::shared_ptr<ProjectedCS> pcs2 = boost::static_pointer_cast<ProjectedCS>(cs2);
 	//boost::shared_ptr<GeographicCS> gcs_Amersfoort = boost::static_pointer_cast<GeographicCS>(csAmersfoort);
 	
 	if(pcs != 0)
 	//if(gcs != 0)
 	{
-		//boost::shared_ptr<XYTrans<CoordLL, CoordXY>> toProj = g_csWGS84->getTransformation(pcs);
-		//boost::shared_ptr<XYTrans<CoordXY, CoordLL>> fromProj = pcs->getTransformation(g_csWGS84);
+		boost::shared_ptr<XYTrans<CoordLL, CoordXY>> toProj = g_csWGS84->getTransformation(pcs);
+		boost::shared_ptr<XYTrans<CoordXY, CoordLL>> fromProj = pcs->getTransformation(g_csWGS84);
 		//boost::shared_ptr<XYTrans<CoordLL, CoordLL>> toProj2 = g_csWGS84->getTransformation(gcs);
 		//boost::shared_ptr<XYTrans<CoordLL, CoordLL>> fromProj2 = gcs->getTransformation(g_csWGS84);
 		//boost::shared_ptr<XYTrans<CoordLL, CoordXY>> toProj = gcs_Amersfoort->getTransformation(pcs);
 		//boost::shared_ptr<XYTrans<CoordXY, CoordLL>> fromProj = pcs->getTransformation(gcs_Amersfoort);
 		//boost::shared_ptr<XYTrans<CoordLL, CoordXY>> toProj = gcs->getTransformation(pcs);
 		//boost::shared_ptr<XYTrans<CoordXY, CoordLL>> fromProj = pcs->getTransformation(gcs);
-		boost::shared_ptr<XYTrans<CoordXY, CoordXY>> toProj = pcs2->getTransformation(pcs);
-		boost::shared_ptr<XYTrans<CoordXY, CoordXY>> fromProj = pcs->getTransformation(pcs2);
+		//boost::shared_ptr<XYTrans<CoordXY, CoordXY>> toProj = pcs2->getTransformation(pcs);
+		//boost::shared_ptr<XYTrans<CoordXY, CoordXY>> fromProj = pcs->getTransformation(pcs2);
 
 		//CoordLL ll0(52.37, 5.5);
 		//CoordLL ll0(52 + 28.0/60.0 + 15.73/3600.0, 2 + 3.0/60.0 + 39.52/3600.0);
@@ -193,6 +203,12 @@ int main(int argc, char *argv[])
 
 	//char c;
 	//std::cin >> c;
+
+	}
+	catch (char *e)
+	{
+		std::cout << "An error has occurred: " << e << std::endl;
+	}
 
 	return 0;
 }
