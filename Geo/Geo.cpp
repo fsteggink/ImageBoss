@@ -141,6 +141,7 @@ CoordLL FromBonne::execute(const CoordXY &input) const
 
 Mercator::Mercator(const std::map<ProjParam, double> &_params): params(_params)
 {
+	a    = params.find(pparA)->second;
 	pm   = 0.0;
 	lon0 = torad(params.find(pparLon0)->second);
 	FE   = params.find(pparFE)->second;
@@ -158,8 +159,8 @@ CoordXY ToMercator::execute(const CoordLL &input) const
 	double lat = torad(input.lat);
 	double lon = torad(input.lon - pm);
 
-	double E = lon - lon0 + FE;
-	double N = log(tan(0.25 * PI + 0.5 * lat)) + FN;
+	double E = a * (lon - lon0) + FE;
+	double N = a * log(tan(0.25 * PI + 0.5 * lat)) + FN;
 
 	return CoordXY(E, N);
 }
@@ -175,8 +176,8 @@ CoordLL FromMercator::execute(const CoordXY &input) const
 	double x = input.x - FE;
 	double y = input.y - FN;
 
-	double lat = 2 * atan(exp(y)) - 0.5 * PI;
-	double lon = x + lon0;
+	double lat = 2 * atan(exp(y / a)) - 0.5 * PI;
+	double lon = x / a + lon0;
 
 	return CoordLL(todeg(lat), todeg(lon) + pm);
 }
@@ -621,6 +622,100 @@ CoordLL FromPreussischePolyeder::execute(const CoordXY &input) const
 
 	double lat = (N - FN) / a + lat0;
 	double lon = (E - FE) / (a * cos(lat)) + lon0;
+
+	lon = normalizeLonRad(lon, 0);
+	return CoordLL(todeg(lat), todeg(lon) + pm);
+}
+
+
+CassiniSoldner::CassiniSoldner(const std::map<ProjParam, double> &_params):
+	params(_params)
+{
+	e2   = params.find(pparE2)->second;
+	a    = params.find(pparA)->second;
+	pm   = params.find(pparPM)->second;
+	lat0 = torad(params.find(pparLat0)->second);
+	lon0 = torad(params.find(pparLon0)->second);
+	k0   = params.find(pparK)->second;
+	FE   = params.find(pparFE)->second;
+	FN   = params.find(pparFN)->second;
+
+	M0 = a * (
+		(1 - e2 / 4 - 3 * pow2(e2) / 64 - 5 * pow3(e2) / 256) * lat0 -
+		(3 * e2 / 8 + 3 * pow2(e2) / 32 + 45 * pow3(e2) / 1024) * sin(2 * lat0) +
+		(15 * pow2(e2) / 256 + 45 * pow3(e2) / 1024) * sin(4 * lat0) -
+		(35 * pow3(e2) / 3072) * sin(6 * lat0));
+}
+
+
+ToCassiniSoldner::ToCassiniSoldner(const std::map<ProjParam, double> &_params):
+	CassiniSoldner(_params)
+{
+}
+
+
+CoordXY ToCassiniSoldner::execute(const CoordLL &input) const
+{
+	double lat = torad(input.lat);
+	double lon = torad(input.lon - pm);
+	lon = normalizeLonRad(lon, lon0);
+
+	double M = a * (
+		(1 - e2 / 4 - 3 * pow2(e2) / 64 - 5 * pow3(e2) / 256) * lat -
+		(3 * e2 / 8 + 3 * pow2(e2) / 32 + 45 * pow3(e2) / 1024) * sin(2 * lat) +
+		(15 * pow2(e2) / 256 + 45 * pow3(e2) / 1024) * sin(4 * lat) -
+		(35 * pow3(e2) / 3072) * sin(6 * lat));
+
+	double nu = a / sqrt(1 - e2 * pow2(sin(lat)));
+	double C = e2 * pow2(cos(lat)) / (1 - e2);
+	double T = pow2(tan(lat));
+	double A = (lon - lon0) * cos(lat);
+	double X = M - M0 + nu * tan(lat) * (pow2(A) / 2 + (5 - T + 6 * C) * pow4(A) / 24);
+
+	double E = FE + nu * (A - T * pow3(A) / 6 - (8 - T + 8 * C) * T * pow5(A) / 120);
+	double N = FN + X;
+
+	return CoordXY(E, N);
+}
+
+
+FromCassiniSoldner::FromCassiniSoldner(const std::map<ProjParam, double> &_params):
+	CassiniSoldner(_params)
+{
+}
+
+
+CoordLL FromCassiniSoldner::execute(const CoordXY &input) const
+{
+	const double EPSILON = 1e-9;
+
+	double E = input.x;
+	double N = input.y;
+
+	double M1 = M0 + (N - FN);
+	double mu1 = M1 / (a * (1 - e2 / 4 - 3 * pow2(e2) / 64 - 5 * pow3(e2) / 256));
+	double e1 = (1 - sqrt(1 - e2)) / (1 + sqrt(1 - e2));
+	double lat1 = mu1 + (3 * e1 / 2 - 27 * pow3(e1) / 32) * sin(2 * mu1) +
+		(21 * pow2(e1) / 16 - 55 * pow4(e1) / 32) * sin(4 * mu1) +
+		(151 * pow3(e1) / 96) * sin(6 * mu1) +
+		(1097 * pow4(e1) / 512) * sin(8 * mu1);
+	double T1 = pow2(tan(lat1));
+	double rho1 = a * (1 - e2) / pow(1 - e2 * pow2(sin(lat1)), 1.5);
+	double nu1 = a / sqrt(1 - e2 * pow2(sin(lat1)));
+	double D = (E - FE) / nu1;
+
+	showVal(M0);
+	showVal(e1);
+	showVal(T1);
+	showVal(nu1);
+	showVal(lat1);
+	showVal(D);
+	showVal(M1);
+	showVal(mu1);
+	showVal(rho1);
+
+	double lat = lat1 - (nu1 * tan(lat1) / rho1) * (pow2(D) / 2 - (1 + 3 * T1) * pow4(D) / 24);
+	double lon = lon0 + (D - T1 * pow3(D) / 3 + (1 + 3 * T1) * T1 * pow5(D) / 15) / cos(lat1);
 
 	lon = normalizeLonRad(lon, 0);
 	return CoordLL(todeg(lat), todeg(lon) + pm);

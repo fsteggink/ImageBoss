@@ -338,6 +338,11 @@ void Projection::setParams(const std::map<ProjParam, double> &params_p)
 		m_tp = boost::shared_ptr<ToProjection>(new ToPreussischePolyeder(params_p));
 		m_fp = boost::shared_ptr<FromProjection>(new FromPreussischePolyeder(params_p));
 	}
+	else if(this->m_name.compare(g_PROJ_CASSINI) == 0 || this->m_name.compare(g_PROJ_CASSINI_SOLDNER) == 0)
+	{
+		m_tp = boost::shared_ptr<ToProjection>(new ToCassiniSoldner(params_p));
+		m_fp = boost::shared_ptr<FromProjection>(new FromCassiniSoldner(params_p));
+	}
 	else
 	{
 		throw "Unknown projection";
