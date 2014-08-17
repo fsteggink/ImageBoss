@@ -51,7 +51,19 @@ void Sheet::load(const RasterLayer<byte>::Pixel &px)
 		//state = 'B';
 		//m_lyr = boost::dynamic_pointer_cast<RasterLayer<byte>, IRasterLayer>(m_img->Layers()[0]);
 		boost::shared_ptr<RasterLayer<byte>> lyr = boost::dynamic_pointer_cast<RasterLayer<byte>, IRasterLayer>(img->Layers()[0]);
-		m_lyr = boost::shared_ptr<RasterLayer<byte>>(new RasterLayer<byte>((int)m_boxClipped.width(), (int)m_boxClipped.height(), lyr->get_SamplesPerPixel()));
+
+		//showVal(lyr->get_SamplesPerPixel());
+		//showVal(px.size());
+		RasterLayer<byte>::Pixel bgColor(lyr->get_SamplesPerPixel());
+		memset(&bgColor[0], 0xFF, bgColor.size());
+		memcpy(&bgColor[0], &px[0], std::min(px.size(), bgColor.size()));
+
+		/*for(RasterLayer<byte>::Pixel::iterator iter = bgColor.begin(); iter != bgColor.end(); ++iter)
+		{
+			showVal(int(*iter));
+		}*/
+
+		m_lyr = boost::shared_ptr<RasterLayer<byte>>(new RasterLayer<byte>((int)m_boxClipped.width(), (int)m_boxClipped.height(), lyr->get_SamplesPerPixel(), bgColor));
 		lyr->getTile(*m_lyr, m_boxClipped.lower);
 		img.reset();
 		//state = 'C';
