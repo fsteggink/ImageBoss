@@ -655,6 +655,9 @@ void LZWDataReader::ReadBytes(boost::shared_ptr<RasterLayer<byte>> &strip, std::
 	input.read(buf, byteCounts);
 	int iDicSize = static_cast<int>(gifDic.size());
 
+	//if((int)input.tellg() == 40943)
+	//	std::cout << "clearCode: " << clearCode << ", endOfInfoCode: " << endOfInfoCode << ", codeSize: " << codeSize << std::endl;
+
 	while(!exit)
 	{
 		// Note that the value needs to be swapped, since the pixels are stored byte by byte.
@@ -662,6 +665,15 @@ void LZWDataReader::ReadBytes(boost::shared_ptr<RasterLayer<byte>> &strip, std::
 		int move = 32 - bitPos % 8 - codeSize;
 		int iValue = (swapIntValue(*reinterpret_cast<int*>(&buf[bitPos / 8])) >> move) & mask;
 		bitPos += codeSize;
+
+		//if((int)input.tellg() == 40943)
+		//	std::cout << "value: " << iValue << ", dic size: " << iDicSize << ", bit pos: " << bitPos << std::endl;
+		if(bitPos > (int)byteCounts * 8)
+		{
+			// Trying to read value beyond the buffer, without encountering an EndOfInfo code
+			exit = true;
+			break;
+		}
 
 		if(iValue == clearCode)
 		{
@@ -713,6 +725,7 @@ void LZWDataReader::ReadBytes(boost::shared_ptr<RasterLayer<byte>> &strip, std::
 		else
 		{
 			// Value too big
+			std::cerr << "Value: " << iValue << ", pos: " << input.tellg() << ", buf size: " << byteCounts << ", dic size: " << iDicSize << std::endl;
 			throw "Invalid GIF code encountered in data";
 		}
 
@@ -741,7 +754,7 @@ void LZWDataReader::ReadBytes(boost::shared_ptr<RasterLayer<byte>> &strip, std::
 			++y;
 		}
 
-		//int iDicSize = static_cast<int>(gifDic.size());
+		int iDicSize = static_cast<int>(gifDic.size());
 		//int testMask = (1 << initCodeSize);
 		//for(int i = initCodeSize; i < 12; ++i, testMask <<= 1)
 		for(int testMask = (1 << (initCodeSize + 1)); testMask <= iDicSize; testMask <<= 1)
