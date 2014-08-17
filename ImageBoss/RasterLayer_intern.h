@@ -300,11 +300,14 @@ public:
 		const T *dataStart = &m_vecData[(*this)(iX + fromX, iY + fromY)];
 		//std::cout << "e" << std::endl;
 
-		/*static*/ float rgb_arr[4];   // Last entry is sum of coeffs product
-		memset(rgb_arr, 0, 4 * sizeof(float));
+		/*static*/ float rgb_arr[5];   // Last entry is sum of coeffs product, fourth entry is alpha (if present)
+		memset(rgb_arr, 0, 5 * sizeof(float));
 		float *cX = &coeffsX.coeffs[0];
 		float *cY = &coeffsY.coeffs[0];
 		//std::cout << "f" << std::endl;
+
+		unsigned int maxK = (bHasPalette) ? 3 : m_iSPP;
+		T pixBuf[4];
 
 		for(unsigned int y = fromY; y < toY; ++y, dataStart += slw)
 		{
@@ -315,35 +318,58 @@ public:
 				float xy = cX[x] * cy;
 				const T *pt = (bHasPalette) ? &m_palPalette[*data * 3] : data;
 
-				for(unsigned int k = 0; k < 3; ++k)
+				for(unsigned int k = 0; k < maxK; ++k)
 				{
 					rgb_arr[k] += xy * static_cast<float>(pt[k]);
 				}
-				rgb_arr[3] += xy;
+				rgb_arr[4] += xy;
 			}
 		}
 		//std::cout << "g" << std::endl;
+		//std::cout << rgb_arr[0] << ", " << rgb_arr[1] << ", " << rgb_arr[2] << ", " << rgb_arr[3] << ", " << rgb_arr[4] << ", spp: " << m_iSPP << std::endl;
 
 		if (ePixBeh == BorderPixelBehavior::UseCurrentColor)
 		{
 			// Use only current color for the pixel
-			for(unsigned int k = 0; k < 3; ++k)
+			for(unsigned int k = 0; k < maxK; ++k)
 			{
-				*(px + k) = Bounds(static_cast<int>(rgb_arr[k]/rgb_arr[3] + 0.5f), m_iMinT, m_iMaxT);
+				pixBuf[k] = Bounds(static_cast<int>(rgb_arr[k]/rgb_arr[4] + 0.5f), m_iMinT, m_iMaxT);
 			}
 		}
 		else
 		{
 			// Use the background color to 'complete' the pixel
 			const T *bg = (bHasPalette) ? &m_palPalette[m_pxBackground[0] * 3] : &m_pxBackground[0];
-			for(unsigned int k = 0; k < 3; ++k)
+			for(unsigned int k = 0; k < maxK; ++k)
 			{
-				rgb_arr[k] += bg[k] * (1.0f - rgb_arr[3]);
+				rgb_arr[k] += bg[k] * (1.0f - rgb_arr[4]);
 				//std::cout << k << std::endl;
-				*(px + k) = Bounds(static_cast<int>(rgb_arr[k] + 0.5f), m_iMinT, m_iMaxT);
+				pixBuf[k] = Bounds(static_cast<int>(rgb_arr[k] + 0.5f), m_iMinT, m_iMaxT);
 			}
 			//std::cout << "h" << std::endl;
 		}
+
+		// Process alpha
+		//std::cout << int(px[0]) << ", " << int(px[1]) << ", " << int(px[2]) << ", " << int(px[3]) << ", " << int(px[4]) << std::endl;
+
+		if(m_iSPP > 3 && pixBuf[3] < m_iMaxT)
+		{
+			//std::cout << "ipol" << std::endl;
+			for(unsigned int k = 0; k < 3; ++k)
+			{
+				float fract = pixBuf[3] / float(m_iMaxT);
+				//a * (1 - fract) + b * fract
+				px[k] = Bounds(static_cast<int>(pixBuf[k] * fract + m_pxBackground[k] * (1 - fract)), m_iMinT, m_iMaxT);
+			}
+		}
+		else
+		{
+			for(unsigned int k = 0; k < 3; ++k)
+			{
+				px[k] = pixBuf[k];
+			}
+		}
+		//std::cout << int(px[0]) << ", " << int(px[1]) << ", " << int(px[2]) << ", " << int(px[3]) << ", " << int(px[4]) << std::endl;
 
 		return;
 	}
