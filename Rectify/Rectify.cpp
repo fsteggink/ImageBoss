@@ -6,8 +6,8 @@
 // Global variables
 int g_polygoncontains = 0;
 std::map<std::string, boost::shared_ptr<CoordinateSystem>> g_mapCS;
-std::map<boost::shared_ptr<Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>>> g_coordCaches_img;
-std::map<boost::shared_ptr<Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>> g_coordCaches_map;
+std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>>> g_coordCaches_img;
+std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>> g_coordCaches_map;
 
 ContextData g_uContext;
 RasterLayer<byte>::Scanline g_sl_bg;
@@ -454,8 +454,8 @@ void ReadLine(RasterLayer<byte>::Scanline &sl, int start, int end, int y, const 
 {
 	// Always reset active sheet
 	ConstSheetIterator activeSheet = activeSheets.end();
-	std::map<boost::shared_ptr<Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>>>::const_iterator iterCC_img;
-	std::map<boost::shared_ptr<Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>>::const_iterator iterCC_map;
+	std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>>>::const_iterator iterCC_img;
+	std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>>::const_iterator iterCC_map;
 	float decX, decY;
 
 	for(int x = start; x < end; ++x)

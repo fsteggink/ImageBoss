@@ -45,8 +45,8 @@ class Sheet;
 template<class T, class U>
 class CoordinateCache;
 
-extern std::map<boost::shared_ptr<Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>>> g_coordCaches_img;
-extern std::map<boost::shared_ptr<Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>> g_coordCaches_map;
+extern std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>>> g_coordCaches_img;
+extern std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>> g_coordCaches_map;
 
 // Inline function definitions
 
@@ -317,6 +317,7 @@ class Sheet
 	std::string m_name;
 	mutable Box<CoordXY> m_boxReg;        // Bounding box (reg coords)
 	mutable Box<CoordXY> m_boxSheet;      // Bounding box (map coords)
+	Box<CoordXY> m_boxTarget;             // Bounding box (target coords)
 
 	//--> TODO: wordt alleen gebruikt voor de contains-method. Kan net zo goed pixel coords bepalen (of is dat te duur?) en m_polygonL gebruiken
 	mutable PolyGon<CoordXY> m_polygon;   // BoundingShape (map coords)
@@ -344,7 +345,7 @@ class Sheet
 	float m_adjustRed, m_adjustGreen, m_adjustBlue;
 
 
-	PixelCoord getOrigCoord_internal(const CoordXY &mapCoord) const;
+	//PixelCoord getOrigCoord_internal(const CoordXY &mapCoord) const;
 	CoordXY getMapCoord_internal(const PixelCoord &imageCoord) const;
 	bool calculateAndAnalyzeBBox() const;
 
@@ -357,7 +358,7 @@ public:
 	bool init();
 	void load(const RasterLayer<byte>::Pixel &px);
 	void unload();
-	PixelCoord getOrigCoord(const CoordXY &mapCoord) const;
+	//PixelCoord getOrigCoord(const CoordXY &mapCoord) const;
 	boost::shared_ptr<const ImageProjection> getImageProjection() const;
 
 	bool contains(const CoordXY &mapCoord) const;
@@ -370,6 +371,8 @@ public:
 	void setPolygonIsAdditional(bool value);
 
 	Box<CoordXY> getBoxSheetMap() const;
+	const Box<CoordXY> &getBoxSheetTarget() const;
+	void setBoxSheetTarget(const Box<CoordXY> &boxTarget);
 
 	void setMapCS(const boost::shared_ptr<CoordinateSystem> &mapCS);
 	const boost::shared_ptr<CoordinateSystem> Sheet::getMapCS() const;

@@ -149,7 +149,11 @@ void SheetIndex::read(std::ifstream &fIn, const boost::shared_ptr<CoordinateSyst
 				{
 					sheet->setAnchors(anchors);
 					if(sheet->init())
+					{
+						Box<CoordXY> boxSheetTgt = reprojectSheetBox(sheet->getBoxSheetMap(), targetBox, sheet->getMapCS(), cs);
+						sheet->setBoxSheetTarget(boxSheetTgt);
 						m_sheets.push_back(sheet);
+					}
 				}
 				firstSheet = false;
 
@@ -279,7 +283,11 @@ void SheetIndex::read(std::ifstream &fIn, const boost::shared_ptr<CoordinateSyst
 	{
 		sheet->setAnchors(anchors);
 		if(sheet->init())
+		{
+			Box<CoordXY> boxSheetTgt = reprojectSheetBox(sheet->getBoxSheetMap(), targetBox, sheet->getMapCS(), cs);
+			sheet->setBoxSheetTarget(boxSheetTgt);
 			m_sheets.push_back(sheet);
+		}
 	}
 
 	return;
@@ -313,14 +321,15 @@ void SheetIndex::loadSheets(SheetIndex &feederSheets, const Box<CoordXY> &box, i
 	static double distX = fabs(GRID_DIST * g_uContext.resx);
 	static double distY = fabs(GRID_DIST * g_uContext.resy);
 
-	std::map<boost::shared_ptr<Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>>>::const_iterator iterCC_img;
-	std::map<boost::shared_ptr<Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>>::const_iterator iterCC_map;
+	std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>>>::const_iterator iterCC_img;
+	std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>>::const_iterator iterCC_map;
 
 	// NOTE: iterator can't be used, because it raises an error when the first sheet has to be
 	// deleted
 	for(int i = 0; i < static_cast<int>(feederSheets.size()); ++i)
 	{
-		Box<CoordXY> boxSheetTgt = reprojectSheetBox(feederSheets[i]->getBoxSheetMap(), box, feederSheets[i]->getMapCS(), cs);
+		//Box<CoordXY> boxSheetTgt = reprojectSheetBox(feederSheets[i]->getBoxSheetMap(), box, feederSheets[i]->getMapCS(), cs);
+		const Box<CoordXY> &boxSheetTgt = feederSheets[i]->getBoxSheetTarget();
 		if(boxSheetTgt.lower.y <= rectY && boxSheetTgt.upper.y >= rectY && \
 			boxSheetTgt.lower.x <= box.upper.x && boxSheetTgt.upper.x >= box.lower.x)
 		{
@@ -363,8 +372,8 @@ void SheetIndex::loadSheets(SheetIndex &feederSheets, const Box<CoordXY> &box, i
 
 void SheetIndex::unloadSheets(const Box<CoordXY> &box, int y, double rectY, const boost::shared_ptr<CoordinateSystem> &cs)
 {
-	std::map<boost::shared_ptr<Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>>>::iterator iterCC_img;
-	std::map<boost::shared_ptr<Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>>::iterator iterCC_map;
+	std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>>>::iterator iterCC_img;
+	std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>>::iterator iterCC_map;
 
 	// NOTE: iterator can't be used, because it raises an error when the first sheet has to be
 	// deleted
@@ -414,6 +423,11 @@ ConstSheetIterator SheetIndex::findActiveSheet(const CoordXY &rectCoord, const b
 		iterSheet != m_sheets.end(); ++iterSheet)
 	{
 		// Test if coord is contained by sheet.
+		if(!(*iterSheet)->getBoxSheetTarget().contains(rectCoord))
+		{
+			continue;
+		}
+
 		boost::shared_ptr<XYTrans<CoordXY, CoordXY>> targetToMap = CreateTransformation((*iterSheet)->getMapCS(), cs);
 		CoordXY mapCoord;
 		//if(targetIsGeographic)

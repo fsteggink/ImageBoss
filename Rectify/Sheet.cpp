@@ -188,6 +188,7 @@ bool Sheet::calculateAndAnalyzeBBox() const
 	m_boxClipped.lower.y = std::max(0, m_boxClipped.lower.y - ANCHOR_CORR);
 	m_boxClipped.upper.x = std::min(w, m_boxClipped.upper.x + ANCHOR_CORR);
 	m_boxClipped.upper.y = std::min(h, m_boxClipped.upper.y + ANCHOR_CORR);
+	//showVal(m_boxClipped);
 
 	// Correct original anchors and polygon
 	for(std::vector<Anchor>::iterator iterAnchor = m_ip->getAnchors().begin(); \
@@ -236,7 +237,7 @@ bool Sheet::calculateAndAnalyzeBBox() const
 }
 
 
-PixelCoord Sheet::getOrigCoord(const CoordXY &mapCoord) const
+/*PixelCoord Sheet::getOrigCoord(const CoordXY &mapCoord) const
 {
 	return getOrigCoord_internal(mapCoord);
 }
@@ -244,7 +245,7 @@ PixelCoord Sheet::getOrigCoord(const CoordXY &mapCoord) const
 PixelCoord Sheet::getOrigCoord_internal(const CoordXY &mapCoord) const
 {
 	return m_ip->getToImageCoord()->execute(mapCoord);
-}
+}*/
 
 CoordXY Sheet::getMapCoord_internal(const PixelCoord &imageCoord) const
 {
@@ -265,14 +266,16 @@ bool Sheet::contains(const CoordXY &mapCoord) const
 	}
 	
 	// Falls within image?
-	PixelCoord imageCoord = getOrigCoord_internal(mapCoord); // expensive!!! Use a coordinate cache somehow...
+	// Not sure if necessary...
+	/*PixelCoord imageCoord = getOrigCoord_internal(mapCoord); // expensive!!! Use a coordinate cache somehow...
 	if(this->m_lyr && this->m_polygon.getRing().size() == 0)
 	{
 		if(imageCoord.x < -0.5 || imageCoord.y < -0.5 || imageCoord.x > this->m_lyr->get_Width() + 0.5 || imageCoord.y > this->m_lyr->get_Height() + 0.5)
 		{
+			std::cout << "Not in image!" << std::endl;
 			return false;
 		}
-	}
+	}*/
 
 	bool result = false;
 	if(this->m_polygon.getRing().size() > 0)
@@ -282,6 +285,7 @@ bool Sheet::contains(const CoordXY &mapCoord) const
 
 	if(this->m_polygon.getRing().size() == 0 || m_polygonIsAdditional)
 	{
+		//std::cout << "Hier" << std::endl;
 		CoordXY cReg = m_transMapReg->execute(mapCoord);
 
 		bool regIsGeographic = (boost::dynamic_pointer_cast<GeographicCS>(m_registeredCS) != 0);
@@ -336,6 +340,18 @@ Box<CoordXY> Sheet::getBoxSheetMap() const
 }
 
 
+const Box<CoordXY> &Sheet::getBoxSheetTarget() const
+{
+	return m_boxTarget;
+}
+
+
+void Sheet::setBoxSheetTarget(const Box<CoordXY> &boxTarget)
+{
+	m_boxTarget = boxTarget;
+}
+
+
 const boost::shared_ptr<RasterLayer<byte>> Sheet::getLayer() const
 {
 	return m_lyr;
@@ -375,10 +391,9 @@ void Sheet::getPixel(RasterLayer<byte>::DataIter &px, const PixelCoord &pc, floa
 	}
 	else
 	{
-
-	//std::cout << "In getPixel" << std::endl;
-	m_lyr->getPixel_filtered(px, pc, decX, decY, uFilter, BorderPixelBehavior::UseCurrentColor);
-	//std::cout << "d" << std::endl;
+		//std::cout << "In getPixel" << std::endl;
+		m_lyr->getPixel_filtered(px, pc, decX, decY, uFilter, BorderPixelBehavior::UseCurrentColor);
+		//std::cout << "d" << std::endl;
 	}
 
 	return;
