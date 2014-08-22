@@ -343,9 +343,10 @@ class Sheet
 	RasterLayer<byte>::Pixel m_color;
 	float m_colorOpacity;
 	float m_adjustRed, m_adjustGreen, m_adjustBlue;
+	mutable boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>> m_coordCache;
 
 
-	PixelCoord getOrigCoord_internal(const CoordXY &mapCoord) const;
+	//PixelCoord getOrigCoord_internal(const CoordXY &mapCoord) const;
 	CoordXY getMapCoord_internal(const PixelCoord &imageCoord) const;
 	bool calculateAndAnalyzeBBox() const;
 
@@ -440,7 +441,7 @@ private:
 
 public:
 	CoordinateCache(
-		const boost::shared_ptr<XYTrans<T, U>> &targetToImage,
+		const boost::shared_ptr<XYTrans<T, U>> &coordTrans,
 		const Box<CoordXY> &targetBox,
 		double distX, double distY):
 		m_targetBox(targetBox), m_distX(distX), m_distY(distY)
@@ -463,7 +464,7 @@ public:
 			for(int x = 0; x < m_dX; ++x)
 			{
 				T c = T(m_targetBox.lower.x + x * m_distX, m_targetBox.lower.y + y * m_distY);
-				U pc = targetToImage->execute(c);
+				U pc = coordTrans->execute(c);
 				m_targetCoords.push_back(pc);
 			}
 		}

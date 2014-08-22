@@ -23,8 +23,8 @@ bool Sheet::init()
 
 	m_transRegMap = CreateTransformation(m_mapCS, m_registeredCS);
 	m_transMapReg = CreateTransformation(m_registeredCS, m_mapCS);
-
 	bool result = calculateAndAnalyzeBBox();
+
 	m_bInit = true;
 
 	return result;
@@ -92,6 +92,16 @@ void Sheet::load(const RasterLayer<byte>::Pixel &px)
 			m_lyr->merge(lyrTemp, m_colorOpacity);
 		}
 		//state = 'I';
+
+		// Determine coordinate cache
+		PixelCoord pc1((m_lyr->get_Width() - GRID_DIST) / 0.5, (m_lyr->get_Height() - GRID_DIST) / 0.5);
+		PixelCoord pc2((m_lyr->get_Width() + GRID_DIST) / 0.5, (m_lyr->get_Height() + GRID_DIST) / 0.5);
+		CoordXY mc1 = getMapCoord_internal(pc1);
+		CoordXY mc2 = getMapCoord_internal(pc2);
+
+		double gridDist = mc1.dist(mc2) * sqrt(0.5);
+		m_coordCache = boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>(
+						new CoordinateCache<CoordXY, CoordXY>(m_transMapReg, m_boxSheet, gridDist, gridDist));
 	}
 	catch(ImageBossException &exc)
 	{
@@ -242,10 +252,10 @@ bool Sheet::calculateAndAnalyzeBBox() const
 	return getOrigCoord_internal(mapCoord);
 }*/
 
-PixelCoord Sheet::getOrigCoord_internal(const CoordXY &mapCoord) const
+/*PixelCoord Sheet::getOrigCoord_internal(const CoordXY &mapCoord) const
 {
 	return m_ip->getToImageCoord()->execute(mapCoord);
-}
+}*/
 
 CoordXY Sheet::getMapCoord_internal(const PixelCoord &imageCoord) const
 {
@@ -276,7 +286,15 @@ bool Sheet::contains(const CoordXY &mapCoord) const
 
 	if(!hasPolygon || m_polygonIsAdditional)
 	{
-		CoordXY cReg = m_transMapReg->execute(mapCoord);
+		CoordXY cReg;
+		if(m_coordCache)
+		{
+			cReg = m_coordCache->execute(mapCoord);
+		}
+		else
+		{
+			cReg = m_transMapReg->execute(mapCoord);
+		}
 
 		bool regIsGeographic = (boost::dynamic_pointer_cast<GeographicCS>(m_registeredCS) != 0);
 		if(regIsGeographic)
