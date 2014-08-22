@@ -508,17 +508,18 @@ void ReadLine(RasterLayer<byte>::Scanline &sl, int start, int end, int y, const 
 				// Bepaal de decimation
 				CoordXY r1 = im.execute(imgC + PixelCoord(1, 1));
 				//state = 'j';
-				PixelCoord p = iterCC_img->second->execute(r);
+				//PixelCoord p = iterCC_img->second->execute(r);
+				pc = iterCC_img->second->execute(r);
 				//state = 'k';
 				PixelCoord p1 = iterCC_img->second->execute(r1);
 				//state = 'l';
 
-				decX = static_cast<float>(fabs(p1.x - p.x));
+				decX = static_cast<float>(fabs(p1.x - pc.x));
 				//state = 'm';
-				decY = static_cast<float>(fabs(p1.y - p.y));
+				decY = static_cast<float>(fabs(p1.y - pc.y));
 				//state = 'n';
 
-				pc = iterCC_img->second->execute(r);
+				//pc = iterCC_img->second->execute(r);
 
 			}
 			//state = 'e';
