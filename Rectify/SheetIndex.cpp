@@ -428,14 +428,17 @@ ConstSheetIterator SheetIndex::findActiveSheet(const CoordXY &rectCoord, const b
 			continue;
 		}
 
-		boost::shared_ptr<XYTrans<CoordXY, CoordXY>> targetToMap = CreateTransformation((*iterSheet)->getMapCS(), cs);
+		/*boost::shared_ptr<XYTrans<CoordXY, CoordXY>> targetToMap = CreateTransformation((*iterSheet)->getMapCS(), cs);
 		CoordXY mapCoord;
 		//if(targetIsGeographic)
 		//	mapCoord = normalizeLon(targetToMap->execute(rectCoord), rectCoord.x);
 		//else
-			mapCoord = targetToMap->execute(rectCoord);
+			mapCoord = targetToMap->execute(rectCoord);*/
 
-		bool bContains = (*iterSheet)->contains(mapCoord);
+		CoordXY mapCoord = g_coordCaches_map.find(*iterSheet)->second->execute(rectCoord);
+		PixelCoord pc = g_coordCaches_img.find(*iterSheet)->second->execute(rectCoord);
+
+		bool bContains = (*iterSheet)->contains(mapCoord, pc);
 
 		if(bContains && (*iterSheet)->getPriority() > maxPriority)
 		{

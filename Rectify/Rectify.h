@@ -345,7 +345,7 @@ class Sheet
 	float m_adjustRed, m_adjustGreen, m_adjustBlue;
 
 
-	//PixelCoord getOrigCoord_internal(const CoordXY &mapCoord) const;
+	PixelCoord getOrigCoord_internal(const CoordXY &mapCoord) const;
 	CoordXY getMapCoord_internal(const PixelCoord &imageCoord) const;
 	bool calculateAndAnalyzeBBox() const;
 
@@ -361,6 +361,7 @@ public:
 	//PixelCoord getOrigCoord(const CoordXY &mapCoord) const;
 	boost::shared_ptr<const ImageProjection> getImageProjection() const;
 
+	bool contains(const CoordXY &mapCoord, const PixelCoord &imageCoord) const;
 	bool contains(const CoordXY &mapCoord) const;
 	bool isOpen() const;
 
@@ -379,6 +380,7 @@ public:
 	void setRegisteredCS(const boost::shared_ptr<CoordinateSystem> &registeredCS);
 
 	void getPixel(RasterLayer<byte>::DataIter &px, const PixelCoord &pc, float decX, float decY, const RasterFilter &uFilter);
+	bool containsPixel(const PixelCoord &imageCoord) const;
 
 	// With regard to priority, one thing that doesn't yet work is that it is automatically detected
 	// that a different sheet with a higher priority should be used while the lower priority sheet

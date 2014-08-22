@@ -240,12 +240,12 @@ bool Sheet::calculateAndAnalyzeBBox() const
 /*PixelCoord Sheet::getOrigCoord(const CoordXY &mapCoord) const
 {
 	return getOrigCoord_internal(mapCoord);
-}
+}*/
 
 PixelCoord Sheet::getOrigCoord_internal(const CoordXY &mapCoord) const
 {
 	return m_ip->getToImageCoord()->execute(mapCoord);
-}*/
+}
 
 CoordXY Sheet::getMapCoord_internal(const PixelCoord &imageCoord) const
 {
@@ -257,6 +257,7 @@ boost::shared_ptr<const ImageProjection> Sheet::getImageProjection() const
 	return m_ip;
 }
 
+
 bool Sheet::contains(const CoordXY &mapCoord) const
 {
 	// Outer box
@@ -264,28 +265,17 @@ bool Sheet::contains(const CoordXY &mapCoord) const
 	{
 		return false;
 	}
-	
-	// Falls within image?
-	// Not sure if necessary...
-	/*PixelCoord imageCoord = getOrigCoord_internal(mapCoord); // expensive!!! Use a coordinate cache somehow...
-	if(this->m_lyr && this->m_polygon.getRing().size() == 0)
-	{
-		if(imageCoord.x < -0.5 || imageCoord.y < -0.5 || imageCoord.x > this->m_lyr->get_Width() + 0.5 || imageCoord.y > this->m_lyr->get_Height() + 0.5)
-		{
-			std::cout << "Not in image!" << std::endl;
-			return false;
-		}
-	}*/
 
+	bool hasPolygon = (this->m_polygon.getRing().size() > 0);
+	
 	bool result = false;
-	if(this->m_polygon.getRing().size() > 0)
+	if(hasPolygon)
 	{
 		result = this->m_polygon.contains(mapCoord);   // Polygon available
 	}
 
-	if(this->m_polygon.getRing().size() == 0 || m_polygonIsAdditional)
+	if(!hasPolygon || m_polygonIsAdditional)
 	{
-		//std::cout << "Hier" << std::endl;
 		CoordXY cReg = m_transMapReg->execute(mapCoord);
 
 		bool regIsGeographic = (boost::dynamic_pointer_cast<GeographicCS>(m_registeredCS) != 0);
@@ -296,6 +286,23 @@ bool Sheet::contains(const CoordXY &mapCoord) const
 	}
 
 	return result;
+}
+
+
+bool Sheet::contains(const CoordXY &mapCoord, const PixelCoord &imageCoord) const
+{
+	bool hasPolygon = (this->m_polygon.getRing().size() > 0);
+	
+	// Falls within image?
+	if(this->m_lyr && !hasPolygon)
+	{
+		if(!containsPixel(imageCoord))
+		{
+			return false;
+		}
+	}
+
+	return this->contains(mapCoord);
 }
 
 
@@ -358,6 +365,16 @@ const boost::shared_ptr<RasterLayer<byte>> Sheet::getLayer() const
 }
 
 
+bool Sheet::containsPixel(const PixelCoord &imageCoord) const
+{
+	return
+		imageCoord.x >= -0.5 &&
+		imageCoord.y >= -0.5 &&
+		imageCoord.x < m_lyr->get_Width() + 0.5 &&
+		imageCoord.y < m_lyr->get_Height() + 0.5;
+}
+
+
 void Sheet::setMapCS(const boost::shared_ptr<CoordinateSystem> &mapCS)
 {
 	m_mapCS = mapCS;
@@ -385,15 +402,9 @@ void Sheet::setRegisteredCS(const boost::shared_ptr<CoordinateSystem> &registere
 void Sheet::getPixel(RasterLayer<byte>::DataIter &px, const PixelCoord &pc, float decX, float decY,
 					 const RasterFilter &uFilter)
 {
-	if(pc.x < 0 || pc.y < 0 || pc.x >= m_lyr->get_Width() || pc.y >= m_lyr->get_Height())
+	if(containsPixel(pc))
 	{
-		//std::cerr << "Attempt to read pixel out of range: " << pc << std::endl;
-	}
-	else
-	{
-		//std::cout << "In getPixel" << std::endl;
 		m_lyr->getPixel_filtered(px, pc, decX, decY, uFilter, BorderPixelBehavior::UseCurrentColor);
-		//std::cout << "d" << std::endl;
 	}
 
 	return;

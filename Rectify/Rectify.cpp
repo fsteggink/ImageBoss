@@ -478,11 +478,13 @@ void ReadLine(RasterLayer<byte>::Scanline &sl, int start, int end, int y, const 
 			if(activeSheet != activeSheets.end())
 			{
 				// Does it fall in the sheet?
-				iterCC_map = g_coordCaches_map.find(*activeSheet);
 				CoordXY r_map = iterCC_map->second->execute(r);
+				pc = iterCC_img->second->execute(r);
 
-				if(!(*activeSheet)->contains(r_map))
+				if(!(*activeSheet)->contains(r_map, pc))
+				{
 					activeSheet = activeSheets.end();
+				}
 			}
 			//state = 'd';
 
@@ -515,11 +517,14 @@ void ReadLine(RasterLayer<byte>::Scanline &sl, int start, int end, int y, const 
 				//state = 'm';
 				decY = static_cast<float>(fabs(p1.y - p.y));
 				//state = 'n';
+
+				pc = iterCC_img->second->execute(r);
+
 			}
 			//state = 'e';
 
 			// Calculate coordinates to get pixel
-			pc = iterCC_img->second->execute(r);
+			//pc = iterCC_img->second->execute(r);
 			//state = 'f';
 		}
 		catch(...)
@@ -564,7 +569,12 @@ ConstSheetIterator getActiveSheet(
 		return activeSheet;
 	}
 
-	// Laad het kaartblad
+	if((*activeSheet)->isOpen())
+	{
+		return activeSheet;
+	}
+
+	// Load the sheet
 	RasterLayer<byte>::Pixel px(3);
 	memcpy(&px[0], &g_sl_bg[0], 3);
 	(*activeSheet)->load(px);
