@@ -404,7 +404,7 @@ public:
 
 inline double ipol(double a, double b, double fract)
 {
-	return a * (1 - fract) + b * fract;
+	return a * (1.0 - fract) + b * fract;
 }
 
 inline double ipol_2(double a, double b, double c, double d, double fractX, double fractY)
@@ -442,7 +442,7 @@ private:
 public:
 	CoordinateCache(
 		const boost::shared_ptr<XYTrans<T, U>> &coordTrans,
-		const Box<CoordXY> &targetBox,
+		const Box<T> &targetBox,
 		double distX, double distY):
 		m_targetBox(targetBox), m_distX(distX), m_distY(distY)
 	{
@@ -458,7 +458,7 @@ public:
 		//std::cout << "Building coord cache; m_dX: " << m_dX << ", m_dY: " << m_dY << std::endl;
 		//showVal(m_targetBox);
 
-		// Vul de cache
+		// Fill the cache
 		for(int y = 0; y < m_dY; ++y)
 		{
 			for(int x = 0; x < m_dX; ++x)
@@ -479,12 +479,11 @@ public:
 		//std::cout << "Coordinate cache " << m_targetBox << " called: " << m_called << std::endl;
 	}
 
-	U execute(const T &input) const
+	bool tryExecute(U &output, const T &input) const
 	{
 		if(!m_targetBox.contains(input))
 		{
-			std::cerr << "ERROR, target box: " << m_targetBox << std::endl;
-			throw "Input not contained by cache";
+			return false;
 		}
 
 		//++m_called;
@@ -502,7 +501,22 @@ public:
 		double fractX = ddX - dX;
 		double fractY = ddY - dY;
 
-		return ipol_2(a, b, c, d, fractX, fractY);
+		output.x = ipol_2(a.x, b.x, c.x, d.x, fractX, fractY);
+		output.y = ipol_2(a.y, b.y, c.y, d.y, fractX, fractY);
+		return true;
+	}
+
+	U execute(const T &input) const
+	{
+		U result;
+
+		if(!tryExecute(result, input))
+		{
+			std::cerr << "ERROR, target box: " << m_targetBox << std::endl;
+			throw "Input not contained by cache";
+		}
+
+		return result;
 	}
 };
 

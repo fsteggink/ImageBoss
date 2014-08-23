@@ -435,10 +435,13 @@ ConstSheetIterator SheetIndex::findActiveSheet(const CoordXY &rectCoord, const b
 		//else
 			mapCoord = targetToMap->execute(rectCoord);*/
 
-		CoordXY mapCoord = g_coordCaches_map.find(*iterSheet)->second->execute(rectCoord);
-		PixelCoord pc = g_coordCaches_img.find(*iterSheet)->second->execute(rectCoord);
+		CoordXY mapCoord;
+		PixelCoord pc;
+		bool bContains =
+			g_coordCaches_map.find(*iterSheet)->second->tryExecute(mapCoord, rectCoord) &&
+			g_coordCaches_img.find(*iterSheet)->second->tryExecute(pc, rectCoord);
 
-		bool bContains = (*iterSheet)->contains(mapCoord, pc);
+		bContains &= (*iterSheet)->contains(mapCoord, pc);
 
 		if(bContains && (*iterSheet)->getPriority() > maxPriority)
 		{

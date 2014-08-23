@@ -454,8 +454,8 @@ void ReadLine(RasterLayer<byte>::Scanline &sl, int start, int end, int y, const 
 {
 	// Always reset active sheet
 	ConstSheetIterator activeSheet = activeSheets.end();
-	std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>>>::const_iterator iterCC_img;
-	std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>>::const_iterator iterCC_map;
+	boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>> imageCC;
+	boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>> mapCC;
 	float decX, decY;
 
 	for(int x = start; x < end; ++x)
@@ -478,10 +478,14 @@ void ReadLine(RasterLayer<byte>::Scanline &sl, int start, int end, int y, const 
 			if(activeSheet != activeSheets.end())
 			{
 				// Does it fall in the sheet?
-				CoordXY r_map = iterCC_map->second->execute(r);
-				pc = iterCC_img->second->execute(r);
+				CoordXY r_map;
 
-				if(!(*activeSheet)->contains(r_map, pc))
+				bool check =
+					mapCC->tryExecute(r_map, r) &&
+					imageCC->tryExecute(pc, r) &&
+					(*activeSheet)->contains(r_map, pc);
+
+				if(!check)
 				{
 					activeSheet = activeSheets.end();
 				}
@@ -501,17 +505,17 @@ void ReadLine(RasterLayer<byte>::Scanline &sl, int start, int end, int y, const 
 				//state = 'h';
 
 				// Bepaal de coordinate caches
-				iterCC_img = g_coordCaches_img.find(*activeSheet);
-				iterCC_map = g_coordCaches_map.find(*activeSheet);
+				imageCC = g_coordCaches_img.find(*activeSheet)->second;
+				mapCC = g_coordCaches_map.find(*activeSheet)->second;
 				//state = 'i';
 
 				// Bepaal de decimation
 				CoordXY r1 = im.execute(imgC + PixelCoord(1, 1));
 				//state = 'j';
 				//PixelCoord p = iterCC_img->second->execute(r);
-				pc = iterCC_img->second->execute(r);
+				pc = imageCC->execute(r);
 				//state = 'k';
-				PixelCoord p1 = iterCC_img->second->execute(r1);
+				PixelCoord p1 = imageCC->execute(r1);
 				//state = 'l';
 
 				decX = static_cast<float>(fabs(p1.x - pc.x));

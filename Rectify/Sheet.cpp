@@ -289,7 +289,7 @@ bool Sheet::contains(const CoordXY &mapCoord) const
 		CoordXY cReg;
 		if(m_coordCache)
 		{
-			cReg = m_coordCache->execute(mapCoord);
+			m_coordCache->tryExecute(cReg, mapCoord);
 		}
 		else
 		{
