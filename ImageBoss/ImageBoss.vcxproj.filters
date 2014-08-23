@@ -30,6 +30,9 @@
     <ClInclude Include="..\..\Inc\RasterLayer_extern.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Filter_Gaussian.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImageBoss.cpp">
@@ -38,5 +41,13 @@
     <ClCompile Include="RasterImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Filter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Filter_Lanczos.h">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -22,9 +22,6 @@ std::map<Interface, std::vector<boost::shared_ptr<IImagePlugin>>> g_mapPlugins;
 bool g_bHasLoadedPlugins = false;
 LARGE_INTEGER g_llStart;
 
-DLLAPI_IMAGEBOSS float LanczosFilter<2>::m_cdPRECALC_RES = 0.1f;
-DLLAPI_IMAGEBOSS float LanczosFilter<3>::m_cdPRECALC_RES = 0.1f;
-
 
 void dummy()
 {

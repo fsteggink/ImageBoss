@@ -150,12 +150,17 @@
     <ClInclude Include="..\..\Inc\Filter.h" />
     <ClInclude Include="..\..\Inc\ImageBoss.h" />
     <ClInclude Include="..\..\Inc\RasterLayer_extern.h" />
+    <ClInclude Include="Filter_Gaussian.h" />
     <ClInclude Include="ImageBoss_internal.h" />
     <ClInclude Include="RasterLayer_intern.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Filter.cpp" />
     <ClCompile Include="ImageBoss.cpp" />
     <ClCompile Include="RasterImage.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Filter_Lanczos.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
