@@ -307,7 +307,6 @@ public:
 		//std::cout << "f" << std::endl;
 
 		unsigned int maxK = (bHasPalette) ? 3 : m_iSPP;
-		T pixBuf[4];
 
 		for(unsigned int y = fromY; y < toY; ++y, dataStart += slw)
 		{
@@ -328,6 +327,7 @@ public:
 		//std::cout << "g" << std::endl;
 		//std::cout << rgb_arr[0] << ", " << rgb_arr[1] << ", " << rgb_arr[2] << ", " << rgb_arr[3] << ", " << rgb_arr[4] << ", spp: " << m_iSPP << std::endl;
 
+		T pixBuf[4];
 		if (ePixBeh == BorderPixelBehavior::UseCurrentColor)
 		{
 			// Use only current color for the pixel
