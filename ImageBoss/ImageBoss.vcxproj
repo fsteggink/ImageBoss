@@ -149,7 +149,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\Inc\Filter.h" />
     <ClInclude Include="..\..\Inc\ImageBoss.h" />
-    <ClInclude Include="..\..\Inc\RasterLayer_extern.h" />
+    <ClInclude Include="..\..\Inc\RasterLayer.h" />
     <ClInclude Include="Filter_Gaussian.h" />
     <ClInclude Include="ImageBoss_internal.h" />
     <ClInclude Include="RasterLayer_intern.h" />

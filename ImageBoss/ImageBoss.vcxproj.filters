@@ -27,10 +27,10 @@
     <ClInclude Include="..\..\Inc\ImageBoss.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Inc\RasterLayer_extern.h">
+    <ClInclude Include="Filter_Gaussian.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Filter_Gaussian.h">
+    <ClInclude Include="..\..\Inc\RasterLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

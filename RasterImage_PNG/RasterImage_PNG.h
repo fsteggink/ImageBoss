@@ -13,7 +13,7 @@
 #endif
 
 #include "../../Inc/ImageBoss.h"
-#include "../../Inc/RasterLayer_extern.h"
+#include "../../Inc/RasterLayer.h"
 #include <fstream>
 
 #define ZLIB_WINAPI

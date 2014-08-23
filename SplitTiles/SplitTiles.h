@@ -8,7 +8,7 @@
 #include <iostream>
 #include "../../Inc/CmdApp.h"
 #include "../../Inc/ImageBoss.h"
-#include "../../Inc/RasterLayer_extern.h"
+#include "../../Inc/RasterLayer.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>

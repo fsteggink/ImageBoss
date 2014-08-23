@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include "../../Inc/ImageBoss.h"
-#include "../../Inc/RasterLayer_extern.h"
+#include "../../Inc/RasterLayer.h"
 
 
 #endif // JOINTILES_H
