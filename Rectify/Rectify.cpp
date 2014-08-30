@@ -409,7 +409,7 @@ void LoadAndReadLine(RasterLayer<byte>::Scanline &sl, int y, const boost::shared
 
 		activeSheets.loadSheets(sheetIndex, g_uContext.box, y, ry, cs);
 		//state='G';
-		activeSheets.unloadSheets(g_uContext.box, y, ry, cs);
+		activeSheets.unloadSheets(y, ry, cs);
 		//state='H';
 
 		ReadLine(sl, 0, g_uContext.width, y, activeSheets, im, cs);
@@ -595,15 +595,15 @@ ConstSheetIterator getActiveSheet(
 // cs1: to
 // cs2: from
 boost::shared_ptr<XYTrans<CoordXY, CoordXY>> CreateTransformation(
-	const boost::shared_ptr<CoordinateSystem> &cs1, const boost::shared_ptr<CoordinateSystem> &cs2)
+	const boost::shared_ptr<CoordinateSystem> &toCS, const boost::shared_ptr<CoordinateSystem> &fromCS)
 {
 	// Create transformation chains for transformations between coordinate systems
 	boost::shared_ptr<XYTrans<CoordXY, CoordXY>> trans;
 
-	boost::shared_ptr<GeographicCS> geo1 = boost::dynamic_pointer_cast<GeographicCS>(cs1);
-	boost::shared_ptr<GeographicCS> geo2 = boost::dynamic_pointer_cast<GeographicCS>(cs2);
-	boost::shared_ptr<ProjectedCS> proj1 = boost::dynamic_pointer_cast<ProjectedCS>(cs1);
-	boost::shared_ptr<ProjectedCS> proj2 = boost::dynamic_pointer_cast<ProjectedCS>(cs2);
+	boost::shared_ptr<GeographicCS> geo1 = boost::dynamic_pointer_cast<GeographicCS>(toCS);
+	boost::shared_ptr<GeographicCS> geo2 = boost::dynamic_pointer_cast<GeographicCS>(fromCS);
+	boost::shared_ptr<ProjectedCS> proj1 = boost::dynamic_pointer_cast<ProjectedCS>(toCS);
+	boost::shared_ptr<ProjectedCS> proj2 = boost::dynamic_pointer_cast<ProjectedCS>(fromCS);
 
 	if(geo1 != 0 && geo2 != 0)
 	{

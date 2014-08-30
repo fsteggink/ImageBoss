@@ -62,6 +62,12 @@ inline int sign(double value)
 }
 
 
+inline int round(double value)
+{
+	return (int)floor(value + 0.5f);
+}
+
+
 // Class definitions
 
 struct Vector
@@ -549,11 +555,11 @@ public:
 	const boost::shared_ptr<Sheet> &operator[](std::vector<boost::shared_ptr<Sheet>>::size_type idx) const;
 	
 	void readGeneral(std::ifstream &fIn);
-	void read(std::ifstream &fIn, const boost::shared_ptr<CoordinateSystem> &cs, const Box<CoordXY> &targetBox);
+	void read(std::ifstream &fIn, const boost::shared_ptr<CoordinateSystem> &targetCS, const Box<CoordXY> &targetBox);
 
 	void matchBox(const Box<CoordXY> &box, const boost::shared_ptr<CoordinateSystem> &cs);
 	void loadSheets(SheetIndex &feederSheets, const Box<CoordXY> &box, int y, double rectY, const boost::shared_ptr<CoordinateSystem> &cs);
-	void unloadSheets(const Box<CoordXY> &box, int y, double rectY, const boost::shared_ptr<CoordinateSystem> &cs);
+	void unloadSheets(int y, double rectY, const boost::shared_ptr<CoordinateSystem> &cs);
 	ConstSheetIterator findActiveSheet(const CoordXY &rectCoord, const boost::shared_ptr<CoordinateSystem> &cs) const;
 };
 
@@ -569,7 +575,7 @@ struct ContextData
 
 // Function declarations
 RasterImage CreateBitmap(const boost::shared_ptr<CoordinateSystem> &cs);
-boost::shared_ptr<XYTrans<CoordXY, CoordXY>> CreateTransformation(const boost::shared_ptr<CoordinateSystem> &cs1, const boost::shared_ptr<CoordinateSystem> &cs2);
+boost::shared_ptr<XYTrans<CoordXY, CoordXY>> CreateTransformation(const boost::shared_ptr<CoordinateSystem> &toCS, const boost::shared_ptr<CoordinateSystem> &fromCS);
 void CreateImage(const std::string &outputFile, const boost::shared_ptr<CoordinateSystem> &cs);
 void CreateImage_scanline(const std::string &outputFile, const boost::shared_ptr<CoordinateSystem> &cs);
 void LoadAndReadLine(RasterLayer<byte>::Scanline &sl, int y, const boost::shared_ptr<CoordinateSystem> &cs);

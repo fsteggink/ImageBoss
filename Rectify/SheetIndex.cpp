@@ -120,7 +120,7 @@ void SheetIndex::readGeneral(std::ifstream &fIn)
 }
 
 
-void SheetIndex::read(std::ifstream &fIn, const boost::shared_ptr<CoordinateSystem> &cs, const Box<CoordXY> &targetBox)
+void SheetIndex::read(std::ifstream &fIn, const boost::shared_ptr<CoordinateSystem> &targetCS, const Box<CoordXY> &targetBox)
 {
 	//std::ifstream fIn(inputFile.c_str());
 
@@ -150,7 +150,7 @@ void SheetIndex::read(std::ifstream &fIn, const boost::shared_ptr<CoordinateSyst
 					sheet->setAnchors(anchors);
 					if(sheet->init())
 					{
-						Box<CoordXY> boxSheetTgt = reprojectSheetBox(sheet->getBoxSheetMap(), targetBox, sheet->getMapCS(), cs);
+						Box<CoordXY> boxSheetTgt = reprojectSheetBox(sheet->getBoxSheetMap(), targetBox, sheet->getMapCS(), targetCS);
 						sheet->setBoxSheetTarget(boxSheetTgt);
 						m_sheets.push_back(sheet);
 					}
@@ -293,7 +293,7 @@ void SheetIndex::read(std::ifstream &fIn, const boost::shared_ptr<CoordinateSyst
 		sheet->setAnchors(anchors);
 		if(sheet->init())
 		{
-			Box<CoordXY> boxSheetTgt = reprojectSheetBox(sheet->getBoxSheetMap(), targetBox, sheet->getMapCS(), cs);
+			Box<CoordXY> boxSheetTgt = reprojectSheetBox(sheet->getBoxSheetMap(), targetBox, sheet->getMapCS(), targetCS);
 			sheet->setBoxSheetTarget(boxSheetTgt);
 			m_sheets.push_back(sheet);
 		}
@@ -310,9 +310,7 @@ void SheetIndex::matchBox(const Box<CoordXY> &box, const boost::shared_ptr<Coord
 	showVal(box);
 	for(int i = 0; i < static_cast<int>(m_sheets.size()); ++i)
 	{
-		// TODO: sheet moet gebruik maken van de bbox in map coords
-		Box<CoordXY> boxSheetTgt = reprojectSheetBox(m_sheets[i]->getBoxSheetMap(), box, m_sheets[i]->getMapCS(), cs);
-		//showVal(boxSheetTgt);
+		const Box<CoordXY> &boxSheetTgt = m_sheets[i]->getBoxSheetTarget();
 		if(boxSheetTgt.lower.y > box.upper.y || boxSheetTgt.upper.y < box.lower.y || \
 			boxSheetTgt.lower.x > box.upper.x || boxSheetTgt.upper.x < box.lower.x)
 		{
@@ -337,7 +335,6 @@ void SheetIndex::loadSheets(SheetIndex &feederSheets, const Box<CoordXY> &box, i
 	// deleted
 	for(int i = 0; i < static_cast<int>(feederSheets.size()); ++i)
 	{
-		//Box<CoordXY> boxSheetTgt = reprojectSheetBox(feederSheets[i]->getBoxSheetMap(), box, feederSheets[i]->getMapCS(), cs);
 		const Box<CoordXY> &boxSheetTgt = feederSheets[i]->getBoxSheetTarget();
 		if(boxSheetTgt.lower.y <= rectY && boxSheetTgt.upper.y >= rectY && \
 			boxSheetTgt.lower.x <= box.upper.x && boxSheetTgt.upper.x >= box.lower.x)
@@ -379,7 +376,7 @@ void SheetIndex::loadSheets(SheetIndex &feederSheets, const Box<CoordXY> &box, i
 }
 
 
-void SheetIndex::unloadSheets(const Box<CoordXY> &box, int y, double rectY, const boost::shared_ptr<CoordinateSystem> &cs)
+void SheetIndex::unloadSheets(int y, double rectY, const boost::shared_ptr<CoordinateSystem> &cs)
 {
 	std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>>>::iterator iterCC_img;
 	std::map<boost::shared_ptr<const Sheet>, boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>>::iterator iterCC_map;
@@ -388,7 +385,7 @@ void SheetIndex::unloadSheets(const Box<CoordXY> &box, int y, double rectY, cons
 	// deleted
 	for(int i = 0; i < static_cast<int>(m_sheets.size()); ++i)
 	{
-		Box<CoordXY> boxSheetTgt = reprojectSheetBox(m_sheets[i]->getBoxSheetMap(), box, m_sheets[i]->getMapCS(), cs);
+		const Box<CoordXY> &boxSheetTgt = m_sheets[i]->getBoxSheetTarget();
 		if(boxSheetTgt.lower.y > rectY || boxSheetTgt.upper.y < rectY)
 		{
 			// Verwijder de coordinate caches
@@ -464,43 +461,26 @@ ConstSheetIterator SheetIndex::findActiveSheet(const CoordXY &rectCoord, const b
 
 Box<CoordXY> SheetIndex::reprojectSheetBox(const Box<CoordXY> &sourceBox, const Box<CoordXY> &boxTgt, const boost::shared_ptr<CoordinateSystem> &sourceCS, const boost::shared_ptr<CoordinateSystem> &targetCS)
 {
-	bool targetIsGeographic = (boost::dynamic_pointer_cast<GeographicCS>(targetCS) != 0);
-
 	Box<CoordXY> targetBox(CoordXY(INFINITE, INFINITE), CoordXY(-INFINITE, -INFINITE));
-	boost::shared_ptr<XYTrans<CoordXY, CoordXY>> trans = CreateTransformation(targetCS, sourceCS);
 
-	// NB: houdt geen rekening met latlon/cylindrical CS
-	if(targetIsGeographic)
-	{
-		double cx = boxTgt.center().x;
-		targetBox.expand(normalizeLon(trans->execute(CoordXY(sourceBox.lower.x, sourceBox.lower.y)), cx));
-		targetBox.expand(normalizeLon(trans->execute(CoordXY(sourceBox.center().x, sourceBox.lower.y)), cx));
-		targetBox.expand(normalizeLon(trans->execute(CoordXY(sourceBox.upper.x, sourceBox.lower.y)), cx));
-		targetBox.expand(normalizeLon(trans->execute(CoordXY(sourceBox.lower.x, sourceBox.center().y)), cx));
-		targetBox.expand(normalizeLon(trans->execute(CoordXY(sourceBox.center().x, sourceBox.center().y)), cx));
-		targetBox.expand(normalizeLon(trans->execute(CoordXY(sourceBox.upper.x, sourceBox.center().y)), cx));
-		targetBox.expand(normalizeLon(trans->execute(CoordXY(sourceBox.lower.x, sourceBox.upper.y)), cx));
-		targetBox.expand(normalizeLon(trans->execute(CoordXY(sourceBox.center().x, sourceBox.upper.y)), cx));
-		targetBox.expand(normalizeLon(trans->execute(CoordXY(sourceBox.upper.x, sourceBox.upper.y)), cx));
-	}
-	else
-	{
-		//boost::shared_ptr<ProjectedCS> proj1 = boost::dynamic_pointer_cast<ProjectedCS>(sourceCS);
-		//proj1->getTransformation()
-		//boost::shared_ptr<XYTrans<CoordXY, CoordXY>> z = CreateTransformation(g_csWGS84, sourceCS);
-		//showVal(sourceBox.lower);
-		//showVal(z->execute(sourceBox.lower));
+	// Keep international date line / sheets on antimeridian in mind
+	boost::shared_ptr<XYTrans<CoordXY, CoordXY>> src2wgs = CreateTransformation(g_csWGS84, sourceCS);
+	boost::shared_ptr<XYTrans<CoordXY, CoordXY>> wgs2tgt = CreateTransformation(targetCS, g_csWGS84);
+	boost::shared_ptr<XYTrans<CoordXY, CoordXY>> tgt2wgs = CreateTransformation(g_csWGS84, targetCS);
 
-		targetBox.expand(trans->execute(CoordXY(sourceBox.lower.x, sourceBox.lower.y)));
-		targetBox.expand(trans->execute(CoordXY(sourceBox.center().x, sourceBox.lower.y)));
-		targetBox.expand(trans->execute(CoordXY(sourceBox.upper.x, sourceBox.lower.y)));
-		targetBox.expand(trans->execute(CoordXY(sourceBox.lower.x, sourceBox.center().y)));
-		targetBox.expand(trans->execute(CoordXY(sourceBox.center().x, sourceBox.center().y)));
-		targetBox.expand(trans->execute(CoordXY(sourceBox.upper.x, sourceBox.center().y)));
-		targetBox.expand(trans->execute(CoordXY(sourceBox.lower.x, sourceBox.upper.y)));
-		targetBox.expand(trans->execute(CoordXY(sourceBox.center().x, sourceBox.upper.y)));
-		targetBox.expand(trans->execute(CoordXY(sourceBox.upper.x, sourceBox.upper.y)));
-	}	
+	double sLon = src2wgs->execute(sourceBox.center()).x;
+	double tLon = tgt2wgs->execute(boxTgt.center()).x;
+	int k = round((tLon - sLon) / 360);
+
+	targetBox.expand(wgs2tgt->execute(src2wgs->execute(CoordXY(sourceBox.lower.x, sourceBox.lower.y)) + CoordXY(k * 360, 0)));
+	targetBox.expand(wgs2tgt->execute(src2wgs->execute(CoordXY(sourceBox.center().x, sourceBox.lower.y)) + CoordXY(k * 360, 0)));
+	targetBox.expand(wgs2tgt->execute(src2wgs->execute(CoordXY(sourceBox.upper.x, sourceBox.lower.y)) + CoordXY(k * 360, 0)));
+	targetBox.expand(wgs2tgt->execute(src2wgs->execute(CoordXY(sourceBox.lower.x, sourceBox.center().y)) + CoordXY(k * 360, 0)));
+	targetBox.expand(wgs2tgt->execute(src2wgs->execute(CoordXY(sourceBox.center().x, sourceBox.center().y)) + CoordXY(k * 360, 0)));
+	targetBox.expand(wgs2tgt->execute(src2wgs->execute(CoordXY(sourceBox.upper.x, sourceBox.center().y)) + CoordXY(k * 360, 0)));
+	targetBox.expand(wgs2tgt->execute(src2wgs->execute(CoordXY(sourceBox.lower.x, sourceBox.upper.y)) + CoordXY(k * 360, 0)));
+	targetBox.expand(wgs2tgt->execute(src2wgs->execute(CoordXY(sourceBox.center().x, sourceBox.upper.y)) + CoordXY(k * 360, 0)));
+	targetBox.expand(wgs2tgt->execute(src2wgs->execute(CoordXY(sourceBox.upper.x, sourceBox.upper.y)) + CoordXY(k * 360, 0)));
 
 	return targetBox;
 }
