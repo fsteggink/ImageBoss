@@ -182,11 +182,8 @@ void SheetIndex::read(std::ifstream &fIn, const boost::shared_ptr<CoordinateSyst
 					CoordXY(atof(vecAPoints[2]), atof(vecAPoints[3])));
 				anchors.push_back(anchor);
 			}
-			else if(vecWords[0] == "BoundingShape" || vecWords[0] == "AdditionalShape")
+			else if(vecWords[0] == "BoundingShape" || vecWords[0] == "AdditionalShape" || vecWords[0] == "SubtractionalShape")
 			{
-				if(vecWords[0] == "AdditionalShape")
-					sheet->setPolygonIsAdditional(true);
-
 				std::vector<std::string> vecBShape = SL::split(vecWords[1], "|");
 				PolyGon<PixelCoord> polygonL;
 				for(std::vector<std::string>::iterator iterOrd = vecBShape.begin(); \
@@ -195,7 +192,19 @@ void SheetIndex::read(std::ifstream &fIn, const boost::shared_ptr<CoordinateSyst
 					PixelCoord pt(atof(*iterOrd), atof(*(iterOrd + 1)));
 					polygonL.addPoint(pt);
 				}
-				sheet->setPolygonL(polygonL);
+
+				if(vecWords[0] == "BoundingShape")
+				{
+					sheet->setBoundingPolygon(polygonL);
+				}
+				else if(vecWords[0] == "AdditionalShape")
+				{
+					sheet->addAdditionalPolygon(polygonL);
+				}
+				else if(vecWords[0] == "SubtractionalShape")
+				{
+					sheet->addSubtractionalPolygon(polygonL);
+				}
 			}
 			else if(vecWords[0] == "ProjectionAlias")
 			{

@@ -6,7 +6,7 @@
 
 Sheet::Sheet(): m_bInit(false), m_priority(0), m_brightnessAndContrastSet(false), m_colorizeSet(false),
 	m_brightness(0), m_contrast(0.0f), m_color(RasterLayer<byte>::Pixel(3)), m_colorOpacity(0.0f),
-	m_adjustRGBSet(false), m_adjustRed(0.0f), m_adjustGreen(0.0f), m_adjustBlue(0.0f), m_polygonIsAdditional(false)
+	m_adjustRGBSet(false), m_adjustRed(0.0f), m_adjustGreen(0.0f), m_adjustBlue(0.0f)
 {
 }
 
@@ -184,10 +184,20 @@ bool Sheet::calculateAndAnalyzeBBox() const
 		m_boxClipped.expand(PixelCoordI((int)iterAnchor->orig.x, (int)iterAnchor->orig.y));
 	}
 
-	for(std::vector<PixelCoord>::const_iterator iterCoord = m_polygonL.getRing().begin(); \
-		iterCoord != m_polygonL.getRing().end(); ++iterCoord)
+	for(std::vector<PixelCoord>::const_iterator iterCoord = m_boundingPolygonL.getRing().begin(); \
+		iterCoord != m_boundingPolygonL.getRing().end(); ++iterCoord)
 	{
 		m_boxClipped.expand(PixelCoordI((int)iterCoord->x, (int)iterCoord->y));
+	}
+
+	for(std::vector<PolyGon<PixelCoord>>::const_iterator iterPol = m_additionalPolygonsL.begin(); \
+		iterPol != m_additionalPolygonsL.end(); ++iterPol)
+	{
+		for(std::vector<PixelCoord>::const_iterator iterCoord = iterPol->getRing().begin(); \
+			iterCoord != iterPol->getRing().end(); ++iterCoord)
+		{
+			m_boxClipped.expand(PixelCoordI((int)iterCoord->x, (int)iterCoord->y));
+		}
 	}
 
 	// Expand corners a bit --> TODO: use decimation, although it doesn't seem to be necessary
@@ -208,13 +218,39 @@ bool Sheet::calculateAndAnalyzeBBox() const
 		iterAnchor->orig.y -= m_boxClipped.lower.y;
 	}
 
-	// Correct polygon and also calculate second polygon
-	for(std::vector<PixelCoord>::iterator iterCoord = m_polygonL.getRing().begin(); \
-		iterCoord != m_polygonL.getRing().end(); ++iterCoord)
+	// Correct polygons and also calculate reprojected polygons
+	for(std::vector<PixelCoord>::iterator iterCoord = m_boundingPolygonL.getRing().begin(); \
+		iterCoord != m_boundingPolygonL.getRing().end(); ++iterCoord)
 	{
 		iterCoord->x -= m_boxClipped.lower.x;
 		iterCoord->y -= m_boxClipped.lower.y;
-		m_polygon.addPoint(getMapCoord_internal(*iterCoord));
+		m_boundingPolygon.addPoint(getMapCoord_internal(*iterCoord));
+	}
+
+	for(std::vector<PolyGon<PixelCoord>>::iterator iterPol = m_additionalPolygonsL.begin(); \
+		iterPol != m_additionalPolygonsL.end(); ++iterPol)
+	{
+		m_additionalPolygons.push_back(PolyGon<CoordXY>());
+		for(std::vector<PixelCoord>::iterator iterCoord = iterPol->getRing().begin(); \
+			iterCoord != iterPol->getRing().end(); ++iterCoord)
+		{
+			iterCoord->x -= m_boxClipped.lower.x;
+			iterCoord->y -= m_boxClipped.lower.y;
+			m_additionalPolygons.back().addPoint(getMapCoord_internal(*iterCoord));
+		}
+	}
+
+	for(std::vector<PolyGon<PixelCoord>>::iterator iterPol = m_subtractionalPolygonsL.begin(); \
+		iterPol != m_subtractionalPolygonsL.end(); ++iterPol)
+	{
+		m_subtractionalPolygons.push_back(PolyGon<CoordXY>());
+		for(std::vector<PixelCoord>::iterator iterCoord = iterPol->getRing().begin(); \
+			iterCoord != iterPol->getRing().end(); ++iterCoord)
+		{
+			iterCoord->x -= m_boxClipped.lower.x;
+			iterCoord->y -= m_boxClipped.lower.y;
+			m_subtractionalPolygons.back().addPoint(getMapCoord_internal(*iterCoord));
+		}
 	}
 
 	// Determine the corners of the image which contain the data
@@ -276,43 +312,59 @@ bool Sheet::contains(const CoordXY &mapCoord) const
 		return false;
 	}
 
-	bool hasPolygon = (this->m_polygon.getRing().size() > 0);
-	
-	bool result = false;
-	if(hasPolygon)
+	// Check subtracting polygons
+	for(PolygonXYIter iterPol = m_subtractionalPolygons.begin(); iterPol != m_subtractionalPolygons.end(); ++iterPol)
 	{
-		result = this->m_polygon.contains(mapCoord);   // Polygon available
+		if(iterPol->contains(mapCoord))
+		{
+			return false;
+		}
 	}
 
-	if(!hasPolygon || m_polygonIsAdditional)
+	// Check bounding polygon
+	if(this->m_boundingPolygon.getRing().size() > 0)
 	{
-		CoordXY cReg;
-		if(m_coordCache)
+		if(this->m_boundingPolygon.contains(mapCoord))
 		{
-			m_coordCache->tryExecute(cReg, mapCoord);
+			return true;
 		}
-		else
-		{
-			cReg = m_transMapReg->execute(mapCoord);
-		}
-
-		bool regIsGeographic = (boost::dynamic_pointer_cast<GeographicCS>(m_registeredCS) != 0);
-		if(regIsGeographic)
-			cReg = normalizeLon(cReg, this->m_boxReg.center().x);
-
-		result |= this->m_boxReg.contains(cReg);
 	}
 
-	return result;
+	// Check additional polygons
+	for(PolygonXYIter iterPol = m_additionalPolygons.begin(); iterPol != m_additionalPolygons.end(); ++iterPol)
+	{
+		if(iterPol->contains(mapCoord))
+		{
+			return true;
+		}
+	}
+
+	// Check extent
+	CoordXY cReg;
+	if(m_coordCache)
+	{
+		m_coordCache->tryExecute(cReg, mapCoord);
+	}
+	else
+	{
+		cReg = m_transMapReg->execute(mapCoord);
+	}
+
+	bool regIsGeographic = (boost::dynamic_pointer_cast<GeographicCS>(m_registeredCS) != 0);
+	if(regIsGeographic)
+		cReg = normalizeLon(cReg, this->m_boxReg.center().x);
+
+	return this->m_boxReg.contains(cReg);
 }
 
 
 bool Sheet::contains(const CoordXY &mapCoord, const PixelCoord &imageCoord) const
 {
-	bool hasPolygon = (this->m_polygon.getRing().size() > 0);
+	// TBD: nodig voor Deense kaarten?
+	//bool hasPolygon = (this->m_polygon.getRing().size() > 0);
 	
 	// Falls within image?
-	if(this->m_lyr && !hasPolygon)
+	if(this->m_lyr /*&& !hasPolygon*/)
 	{
 		if(!containsPixel(imageCoord))
 		{
@@ -344,18 +396,21 @@ void Sheet::setAnchors(const std::vector<Anchor> &anchors)
 }
 
 
-void Sheet::setPolygonL(const PolyGon<PixelCoord> &polygonL)
+void Sheet::setBoundingPolygon(const PolyGon<PixelCoord> &polygon)
 {
-	m_polygonL = polygonL;
-
-	return;
+	m_boundingPolygonL = polygon;
 }
 
 
-void Sheet::setPolygonIsAdditional(bool value)
+void Sheet::addAdditionalPolygon(const PolyGon<PixelCoord> &polygon)
 {
-	m_polygonIsAdditional = value;
-	return;
+	m_additionalPolygonsL.push_back(polygon);
+}
+
+
+void Sheet::addSubtractionalPolygon(const PolyGon<PixelCoord> &polygon)
+{
+	m_subtractionalPolygonsL.push_back(polygon);
 }
 
 

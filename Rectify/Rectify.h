@@ -319,15 +319,20 @@ class Sheet
 	mutable Box<CoordXY> m_boxSheet;      // Bounding box (map coords)
 	Box<CoordXY> m_boxTarget;             // Bounding box (target coords)
 
-	//--> TODO: wordt alleen gebruikt voor de contains-method. Kan net zo goed pixel coords bepalen (of is dat te duur?) en m_polygonL gebruiken
-	mutable PolyGon<CoordXY> m_polygon;   // BoundingShape (map coords)
-	mutable PolyGon<PixelCoord> m_polygonL;       // BoundingShape (pixel coords)
-	bool m_polygonIsAdditional;
+	// Polygons in map coords
+	mutable PolyGon<CoordXY> m_boundingPolygon;
+	mutable std::vector<PolyGon<CoordXY>> m_additionalPolygons;
+	mutable std::vector<PolyGon<CoordXY>> m_subtractionalPolygons;
+	typedef std::vector<PolyGon<CoordXY>>::const_iterator PolygonXYIter;
+
+	// Polygons in pixel coords
+	mutable PolyGon<PixelCoord> m_boundingPolygonL;
+	mutable std::vector<PolyGon<PixelCoord>> m_additionalPolygonsL;
+	mutable std::vector<PolyGon<PixelCoord>> m_subtractionalPolygonsL;
 
 	mutable Box<PixelCoordI> m_boxClipped;
 
 	int m_priority;
-
 
 	boost::shared_ptr<RasterLayer<byte>> m_lyr;
 
@@ -345,8 +350,6 @@ class Sheet
 	float m_adjustRed, m_adjustGreen, m_adjustBlue;
 	mutable boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>> m_coordCache;
 
-
-	//PixelCoord getOrigCoord_internal(const CoordXY &mapCoord) const;
 	CoordXY getMapCoord_internal(const PixelCoord &imageCoord) const;
 	bool calculateAndAnalyzeBBox() const;
 
@@ -369,8 +372,9 @@ public:
 	void setName(const std::string &name);
 	const std::string &getName() const;
 	void setAnchors(const std::vector<Anchor> &anchors);
-	void setPolygonL(const PolyGon<PixelCoord> &polygonL);
-	void setPolygonIsAdditional(bool value);
+	void setBoundingPolygon(const PolyGon<PixelCoord> &polygon);
+	void addAdditionalPolygon(const PolyGon<PixelCoord> &polygon);
+	void addSubtractionalPolygon(const PolyGon<PixelCoord> &polygon);
 
 	Box<CoordXY> getBoxSheetMap() const;
 	const Box<CoordXY> &getBoxSheetTarget() const;
