@@ -122,8 +122,6 @@ void SheetIndex::readGeneral(std::ifstream &fIn)
 
 void SheetIndex::read(std::ifstream &fIn, const boost::shared_ptr<CoordinateSystem> &targetCS, const Box<CoordXY> &targetBox)
 {
-	//std::ifstream fIn(inputFile.c_str());
-
 	std::string line;
 	boost::shared_ptr<Sheet>sheet(new Sheet());
 	bool firstSheet = true;
@@ -344,7 +342,7 @@ void SheetIndex::loadSheets(SheetIndex &feederSheets, const Box<CoordXY> &box, i
 			std::cout << "box: " << boxSheetTgt << std::endl;
 			m_sheets.push_back(feederSheets[i]);
 
-			// Bepaal de coordinate caches
+			// Determine the coordinate caches
 			boost::shared_ptr<XYTrans<CoordXY, CoordXY>> targetToMap = CreateTransformation(feederSheets[i]->getMapCS(), cs);
 
 			iterCC_img = g_coordCaches_img.find(feederSheets[i]);
@@ -366,7 +364,7 @@ void SheetIndex::loadSheets(SheetIndex &feederSheets, const Box<CoordXY> &box, i
 				iterCC_map = g_coordCaches_map.find(feederSheets[i]);
 			}
 
-			// Verwijder de te laden sheet uit de feederlijst
+			// Remove the sheet to be loaded from the feeder list
 			feederSheets.getSheets().erase(feederSheets.getSheets().begin() + i);
 			i--;
 		}
@@ -388,7 +386,7 @@ void SheetIndex::unloadSheets(int y, double rectY, const boost::shared_ptr<Coord
 		const Box<CoordXY> &boxSheetTgt = m_sheets[i]->getBoxSheetTarget();
 		if(boxSheetTgt.lower.y > rectY || boxSheetTgt.upper.y < rectY)
 		{
-			// Verwijder de coordinate caches
+			// Remove the coordinate caches
 			iterCC_img = g_coordCaches_img.find(m_sheets[i]);
 			if(iterCC_img != g_coordCaches_img.end())
 			{
@@ -406,9 +404,9 @@ void SheetIndex::unloadSheets(int y, double rectY, const boost::shared_ptr<Coord
 			std::cout << y << ", " << rectY << ": remove active sheet " << i << "/" <<
 				m_sheets.size() << ", name: " << m_sheets[i]->getName() << ", box: " << boxSheetTgt << std::endl;
 			m_sheets[i]->unload();
+
 			// Direct erase causes a crash! Swap sheet with last sheets works fine
 			std::swap(m_sheets[i], m_sheets.back());
-
 			m_sheets.erase(m_sheets.end() - 1);
 			i--;
 		}
@@ -423,8 +421,6 @@ ConstSheetIterator SheetIndex::findActiveSheet(const CoordXY &rectCoord, const b
 	ConstSheetIterator activeSheet = m_sheets.end();
 	int maxPriority = 0x80000000;
 
-	//bool targetIsGeographic = (boost::dynamic_pointer_cast<GeographicCS>(cs) != 0);
-
 	for(ConstSheetIterator iterSheet = m_sheets.begin(); \
 		iterSheet != m_sheets.end(); ++iterSheet)
 	{
@@ -433,13 +429,6 @@ ConstSheetIterator SheetIndex::findActiveSheet(const CoordXY &rectCoord, const b
 		{
 			continue;
 		}
-
-		/*boost::shared_ptr<XYTrans<CoordXY, CoordXY>> targetToMap = CreateTransformation((*iterSheet)->getMapCS(), cs);
-		CoordXY mapCoord;
-		//if(targetIsGeographic)
-		//	mapCoord = normalizeLon(targetToMap->execute(rectCoord), rectCoord.x);
-		//else
-			mapCoord = targetToMap->execute(rectCoord);*/
 
 		CoordXY mapCoord;
 		PixelCoord pc;
