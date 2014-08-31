@@ -324,10 +324,7 @@ bool Sheet::contains(const CoordXY &mapCoord) const
 	// Check bounding polygon
 	if(this->m_boundingPolygon.getRing().size() > 0)
 	{
-		if(this->m_boundingPolygon.contains(mapCoord))
-		{
-			return true;
-		}
+		return (this->m_boundingPolygon.contains(mapCoord));
 	}
 
 	// Check additional polygons
