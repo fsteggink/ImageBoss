@@ -344,15 +344,32 @@ void SheetIndex::loadSheets(SheetIndex &feederSheets, const Box<CoordXY> &box, i
 
 			// Determine the coordinate caches
 			boost::shared_ptr<XYTrans<CoordXY, CoordXY>> targetToMap = CreateTransformation(feederSheets[i]->getMapCS(), cs);
+			boost::shared_ptr<XYTrans<CoordXY, CoordXY>> mapToTarget = CreateTransformation(cs, feederSheets[i]->getMapCS());
+			boost::shared_ptr<XYTrans<CoordXY, PixelCoord>> targetToImage =
+				boost::shared_ptr<XYTrans<CoordXY, PixelCoord>>(new TransChain<CoordXY, PixelCoord, CoordXY>(targetToMap, feederSheets[i]->getImageProjection()->getToImageCoord()));
+
+			double offsetX = distX;
+			double offsetY = distY;
+
+			// Recalculate offset, so coordinate caches do not become too big when zooming in far
+			CoordXY centerTargetCS = mapToTarget->execute(feederSheets[i]->getBoxSheetMap().center());
+			PixelCoord centerPx = targetToImage->execute(centerTargetCS);
+			PixelCoord offsetPx = targetToImage->execute(centerTargetCS + CoordXY(distX, distY));
+			if(pow2(centerPx.x - offsetPx.x) + pow2(centerPx.y - offsetPx.y) < pow2(GRID_DIST) * 2)
+			{
+				boost::shared_ptr<XYTrans<PixelCoord, CoordXY>> imageToTarget =
+					boost::shared_ptr<XYTrans<PixelCoord, CoordXY>>(new TransChain<PixelCoord, CoordXY, CoordXY>(feederSheets[i]->getImageProjection()->getFromImageCoord(), mapToTarget));
+				CoordXY newOffsetTargetCS = imageToTarget->execute(centerPx + PixelCoord(GRID_DIST, GRID_DIST));
+
+				offsetX = fabs(centerTargetCS.x - newOffsetTargetCS.x);
+				offsetY = fabs(centerTargetCS.y - newOffsetTargetCS.y);
+			}
 
 			iterCC_img = g_coordCaches_img.find(feederSheets[i]);
 			if(iterCC_img == g_coordCaches_img.end())
 			{
-				boost::shared_ptr<XYTrans<CoordXY, PixelCoord>> targetToImage =
-					boost::shared_ptr<XYTrans<CoordXY, PixelCoord>>(new TransChain<CoordXY, PixelCoord, CoordXY>(targetToMap, feederSheets[i]->getImageProjection()->getToImageCoord()));
-
 				g_coordCaches_img[feederSheets[i]] = boost::shared_ptr<CoordinateCache<CoordXY, PixelCoord>>(
-					new CoordinateCache<CoordXY, PixelCoord>(targetToImage, boxSheetTgt, distX, distY));
+					new CoordinateCache<CoordXY, PixelCoord>(targetToImage, boxSheetTgt, offsetX, offsetY));
 				iterCC_img = g_coordCaches_img.find(feederSheets[i]);
 			}
 
@@ -360,7 +377,7 @@ void SheetIndex::loadSheets(SheetIndex &feederSheets, const Box<CoordXY> &box, i
 			if(iterCC_map == g_coordCaches_map.end())
 			{
 				g_coordCaches_map[feederSheets[i]] = boost::shared_ptr<CoordinateCache<CoordXY, CoordXY>>(
-					new CoordinateCache<CoordXY, CoordXY>(targetToMap, boxSheetTgt, distX, distY));
+					new CoordinateCache<CoordXY, CoordXY>(targetToMap, boxSheetTgt, offsetX, offsetY));
 				iterCC_map = g_coordCaches_map.find(feederSheets[i]);
 			}
 
